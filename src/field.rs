@@ -1,0 +1,325 @@
+/*
+   Copyright 2020 Alexander Efremkin
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+*/
+
+use crate::extfn;
+use wasm_bindgen::prelude::*;
+
+use crate::particle::{BindingConfiguration, BindingResult, MovingParticle, StaticParticle};
+use crate::vector::*;
+
+const MAX_MOVING: usize = 1000;
+const MAX_STATIC: usize = 5000;
+
+/// Renderable field
+/// TODO:
+/// 1. Multiple particle types (per bind point configuration)
+/// 2. (optimization) Have an "accepting" index into static particles
+///    that have not exceeded their bind point limit
+/// 3. Global "currents" grid
+/// 4. (optimization) collision bins?
+#[wasm_bindgen]
+pub struct Field {
+    // particles (with hard limit)
+    moving_particles: [MovingParticle; MAX_MOVING],
+    // particles (with hard limit)
+    static_particles: [StaticParticle; MAX_STATIC],
+    // binding configurations
+    bind_cfgs: [BindingConfiguration; 1],
+    // field dimensions, from -dim to +dim
+    dimensions: Vector,
+    // number of used particles
+    pub num_moving_particles: usize,
+    pub num_static_particles: usize,
+}
+
+#[wasm_bindgen]
+impl Field {
+    /// generate random position in the field (elliptical field)
+    fn random_pos_in_field(dimensions: &Vector) -> Vector {
+        loop {
+            let v = Vector {
+                x: (extfn::random() * 2. - 1.) * dimensions.x,
+                y: (extfn::random() * 2. - 1.) * dimensions.y,
+            };
+            if v.x * v.x / (dimensions.x * dimensions.x) + v.y * v.y / (dimensions.y * dimensions.y)
+                <= 1.
+            {
+                return v;
+            }
+        }
+    }
+    /// generate random position on the field boundary (elliptical field)
+    fn random_boundary_pos_in_field(dimensions: &Vector) -> Vector {
+        // this is slightly wrong, because densities will skew in a truly elliptical field
+        let mut v = Field::random_vel_in_field();
+        v.x *= dimensions.x;
+        v.y *= dimensions.y;
+        v
+    }
+
+    /// generate random velocity vector with length 1
+    fn random_vel_in_field() -> Vector {
+        let theta_sc = (extfn::random() * 6.28).sin_cos();
+        Vector {
+            x: theta_sc.0,
+            y: theta_sc.1,
+        }
+    }
+
+    #[wasm_bindgen(constructor)]
+    pub fn new(half_width: f64, half_height: f64) -> Field {
+        Field {
+            moving_particles: [MovingParticle::default(); MAX_MOVING],
+            static_particles: [StaticParticle::default(); MAX_STATIC],
+            bind_cfgs: [BindingConfiguration::make_hexa()],
+            dimensions: Vector {
+                x: half_width,
+                y: half_height,
+            },
+            num_moving_particles: 0,
+            num_static_particles: 1,
+        }
+    }
+
+    pub fn moving_particles_ptr(&self) -> *const MovingParticle {
+        self.moving_particles.as_ptr()
+    }
+    pub fn static_particles_ptr(&self) -> *const StaticParticle {
+        self.static_particles.as_ptr()
+    }
+
+    /// add a particle anywhere in the field
+    pub fn add_particle(&mut self) {
+        if self.num_moving_particles < MAX_MOVING - 1 {
+            let pos = Field::random_pos_in_field(&self.dimensions);
+            let vel = Field::random_vel_in_field();
+            self.moving_particles[self.num_moving_particles] = MovingParticle {
+                pos,
+                vel,
+                since: 0.,
+                flags: 0,
+            };
+            self.num_moving_particles += 1
+        }
+    }
+
+    /// add a particle on the field boundary
+    pub fn add_boundary_particle(&mut self, since: f64) {
+        if self.num_moving_particles < MAX_MOVING - 1 {
+            let pos = Field::random_boundary_pos_in_field(&self.dimensions);
+            let vel = Field::random_vel_in_field();
+            self.moving_particles[self.num_moving_particles] = MovingParticle {
+                pos,
+                vel,
+                since,
+                flags: 0,
+            };
+            self.num_moving_particles += 1
+        }
+    }
+
+    /// make a moving particle static
+    fn convert_particle_to_static(
+        &mut self,
+        moving_particle_idx: usize,
+        static_particle_idx: usize,
+        binding_result: BindingResult,
+    ) {
+        if moving_particle_idx < self.num_moving_particles
+            && self.num_static_particles < MAX_STATIC - 1
+        {
+            // apply binding operation to convert moving particle to static
+            if let Some(new_static_particle) = binding_result.apply_binding(
+                &self.moving_particles[moving_particle_idx],
+                &mut self.static_particles[static_particle_idx],
+                &self.bind_cfgs[0],
+                &self.bind_cfgs[0],
+            ) {
+                // move to static list
+                self.static_particles[self.num_static_particles] = new_static_particle;
+                self.num_static_particles += 1;
+                // replace moved particle with the last one from the list
+                self.moving_particles[moving_particle_idx] =
+                    self.moving_particles[self.num_moving_particles - 1];
+                self.num_moving_particles -= 1;
+            }
+        }
+    }
+
+    /// update particle positions according to time delta
+    pub fn update_positions(&mut self, delta: f64) {
+        for particle in &mut self.moving_particles {
+            particle.pos.x += particle.vel.x * delta;
+            particle.pos.y += particle.vel.y * delta;
+        }
+    }
+
+    /// update particle velocities according to time delta
+    pub fn update_velocities(&mut self, delta: f64) {
+        for particle in &mut self.moving_particles {
+            let new_dir = Field::random_vel_in_field();
+            let center_attractor =
+                0.5 - 0.5 * (self.num_static_particles as f64) / MAX_STATIC as f64;
+            particle.vel = Vector::normalize(&Vector {
+                x: particle.vel.x
+                    + -center_attractor * particle.pos.x / self.dimensions.x
+                    + new_dir.x * delta,
+                y: particle.vel.y
+                    + -center_attractor * particle.pos.y / self.dimensions.y
+                    + new_dir.y * delta,
+            });
+        }
+    }
+
+    /// test particles that can attach and return a list of their indices
+    /// (note the limits - at most 4 particles are returned per call)
+    fn check_attachment(&self) -> [(usize, usize, Option<BindingResult>); 4] {
+        let mut result = [(MAX_MOVING, MAX_STATIC, None); 4];
+        let mut n_results = 0;
+        let bind_cfg = &self.bind_cfgs[0];
+
+        'outer: for (index, &moving) in self
+            .moving_particles
+            .iter()
+            .enumerate()
+            .take(self.num_moving_particles)
+        {
+            'inner: for (index_static, fixed) in self
+                .static_particles
+                .iter()
+                .enumerate()
+                .take(self.num_static_particles)
+            {
+                if let Some(binding) =
+                    BindingResult::get_binding(&moving, &fixed, bind_cfg, bind_cfg)
+                {
+                    result[n_results] = (index, index_static, Some(binding));
+                    n_results += 1;
+                    if n_results == 4 {
+                        break 'outer;
+                    }
+                    break 'inner;
+                }
+            }
+        }
+        result
+    }
+
+    /// update attachments and particles disposition
+    pub fn update_attachments(&mut self) {
+        let mut attachments: [(usize, usize, Option<BindingResult>); 4] = self.check_attachment();
+        // sort descending, because particle conversion changes indices of
+        // processed vertices in a way that would interfere with attachment results
+        attachments.sort_unstable_by(|a, b| b.0.cmp(&a.0));
+        for &(index_moving, index_static, bind_result_opt) in attachments.iter() {
+            if let Some(bind_result) = bind_result_opt {
+                self.convert_particle_to_static(index_moving, index_static, bind_result);
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use wasm_bindgen_test::*;
+
+    #[wasm_bindgen_test]
+    fn attachment() {
+        let mut f = Field::new(10., 10.);
+        let d = Vector { x: 1.0, y: 0.0 };
+        f.moving_particles[0] = MovingParticle {
+            pos: Vector { x: 1.0, y: 0.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.moving_particles[1] = MovingParticle {
+            pos: Vector { x: -5.0, y: 1.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.moving_particles[2] = MovingParticle {
+            pos: Vector { x: 2.0, y: 2.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.moving_particles[3] = MovingParticle {
+            pos: Vector { x: -5.0, y: 6.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.num_moving_particles = 4;
+
+        let att = f.check_attachment();
+        assert_eq!(att[0].0, 0);
+        assert_eq!(att[1].0, 2);
+        assert_eq!(att[2].0, MAX_MOVING);
+        assert_eq!(att[3].0, MAX_MOVING);
+
+        f.update_attachments();
+
+        let att = f.check_attachment();
+        assert_eq!(att[0].0, MAX_MOVING);
+        assert_eq!(att[1].0, MAX_MOVING);
+        assert_eq!(att[2].0, MAX_MOVING);
+        assert_eq!(att[3].0, MAX_MOVING);
+    }
+
+    #[wasm_bindgen_test]
+    fn attachment_multi() {
+        let mut f = Field::new(10., 10.);
+        let d = Vector { x: 1.0, y: 0.0 };
+        f.static_particles[1] = StaticParticle {
+            pos: Vector { x: 1.0, y: 0.0 },
+            rot: 0.,
+            binding_cfg_id: 0,
+        };
+        f.num_static_particles = 2;
+
+        f.moving_particles[0] = MovingParticle {
+            pos: Vector { x: -5.0, y: 1.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.moving_particles[1] = MovingParticle {
+            pos: Vector { x: 2.0, y: 2.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.moving_particles[2] = MovingParticle {
+            pos: Vector { x: -5.0, y: 6.0 },
+            vel: d,
+            since: 0.,
+            flags: 0,
+        };
+        f.num_moving_particles = 3;
+
+        let att = f.check_attachment();
+        assert_eq!(att[0].0, 1);
+        assert_eq!(att[1].0, MAX_MOVING);
+
+        f.update_attachments();
+
+        let att = f.check_attachment();
+        assert_eq!(att[0].0, MAX_MOVING);
+    }
+}

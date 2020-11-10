@@ -1,0 +1,34 @@
+{
+  "name": "valo-html",
+  "version": "0.1.0",
+  "description": "Etude in WASM flavour of Rust",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --config webpack.config.js",
+    "start": "webpack-dev-server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kriolyth/valo.git"
+  },
+  "keywords": [
+    "webassembly",
+    "wasm",
+    "rust",
+    "webpack"
+  ],
+  "author": "Krio Lyth <kriolyth@gmail.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "valo": "file:../pkg",
+    "pixi.js": "^5.3.3"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^6.3.0",
+    "ts-loader": "^8.0.11",
+    "typescript": "^4.0.5",
+    "webpack": "^5.4.0",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
+  }
+}
