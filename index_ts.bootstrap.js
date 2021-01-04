@@ -560,7 +560,7 @@ var App = /** @class */ (function () {
     /// field setup
     App.prototype.setup = function () {
         var _this = this;
-        for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.numParticles; i++) {
+        for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.startParticles; i++) {
             this.field.add_particle();
         }
         this.pixi.stage.addChild(this.movingParticlesContainer);
@@ -588,8 +588,10 @@ var App = /** @class */ (function () {
         (0,_frame__WEBPACK_IMPORTED_MODULE_2__.updateVisibleParticles)();
         for (var tick = 0; tick < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.ticksPerCall; tick++) {
             this.field.update_attachments();
-            this.field.update_positions(0.7);
-            this.field.update_velocities(0.7);
+            // Moving particles have velocities; this is how fast their positions changes in velocity direction
+            this.field.update_positions(0.75);
+            // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
+            this.field.update_velocities(0.8);
             if (this.field.num_moving_particles + this.field.num_static_particles < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles) {
                 // additional spawn rate from consumed particles
                 var addSpawnRate = this.field.num_static_particles / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
@@ -659,7 +661,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
     width: 512,
     height: 512,
-    maxfps: 60
+    maxfps: 60 // limit fps
 });
 
 
@@ -683,10 +685,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
     width: 256,
     height: 256,
-    numParticles: 0,
+    startParticles: 0,
     maxParticles: 2000,
     spawnRate: 25.,
-    ticksPerCall: 4,
+    ticksPerCall: 2,
 });
 
 
