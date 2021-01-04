@@ -1,8 +1,8 @@
 export default {
-    width: 256,
-    height: 256,
-    numParticles: 0,
-    maxParticles: 2000,
-    spawnRate: 25.,  //  new particles per second
-    ticksPerCall: 4,    // sim iterations per draw call
+    width: 256,         // field half-width
+    height: 256,        // field half-height
+    startParticles: 0,  // generate this many particles at start
+    maxParticles: 2000, // max particles (see also limits in field.rs)
+    spawnRate: 25.,     // new particles per second
+    ticksPerCall: 2,    // simulation iterations per draw call
 }

@@ -53,7 +53,7 @@ class App {
 
     /// field setup
     setup() {
-        for (let i = 0; i < config.field.numParticles; i++) {
+        for (let i = 0; i < config.field.startParticles; i++) {
             this.field.add_particle()
         }
 
@@ -95,8 +95,12 @@ class App {
 
         for (let tick = 0; tick < config.field.ticksPerCall; tick++) {
             this.field.update_attachments();
-            this.field.update_positions(0.7);
-            this.field.update_velocities(0.7);
+            
+            // Moving particles have velocities; this is how fast their positions changes in velocity direction
+            this.field.update_positions(0.75);
+
+            // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
+            this.field.update_velocities(0.8);
 
             if (this.field.num_moving_particles + this.field.num_static_particles < config.field.maxParticles) {
                 // additional spawn rate from consumed particles

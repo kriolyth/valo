@@ -1,5 +1,5 @@
 export default {
-    width: 512,
-    height: 512,
-    maxfps: 60
+    width: 512,     // canvas width
+    height: 512,    // canvas height
+    maxfps: 60      // limit fps
 }

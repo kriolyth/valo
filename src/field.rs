@@ -23,6 +23,11 @@ use crate::vector::*;
 const MAX_MOVING: usize = 1000;
 const MAX_STATIC: usize = 5000;
 
+/// Particles are affected by field force; e.g. centripetal force
+/// to prevent them from scattering away.
+/// Field force, different at every point, is multiplied by this constant
+const VELOCITY_FIELD_ATTENUATION: f64 = 1.0;
+
 /// Renderable field
 /// TODO:
 /// 1. Multiple particle types (per bind point configuration)
@@ -162,25 +167,38 @@ impl Field {
     /// update particle positions according to time delta
     pub fn update_positions(&mut self, delta: f64) {
         for particle in &mut self.moving_particles {
-            particle.pos.x += particle.vel.x * delta;
-            particle.pos.y += particle.vel.y * delta;
+            particle.pos += particle.vel * delta;
+        }
+    }
+
+    /// simple center attractor vector, diminishes at the center
+    fn center_attractor_vector(pos: &Vector, field_dim: &Vector) -> Vector {
+        Vector {
+            x: -(pos.x / field_dim.x),
+            y: -(pos.y / field_dim.y),
         }
     }
 
     /// update particle velocities according to time delta
     pub fn update_velocities(&mut self, delta: f64) {
         for particle in &mut self.moving_particles {
+            // particle can always change its direction unpredictably (Brownian motion)
             let new_dir = Field::random_vel_in_field();
-            let center_attractor =
-                0.5 - 0.5 * (self.num_static_particles as f64) / MAX_STATIC as f64;
-            particle.vel = Vector::normalize(&Vector {
-                x: particle.vel.x
-                    + -center_attractor * particle.pos.x / self.dimensions.x
-                    + new_dir.x * delta,
-                y: particle.vel.y
-                    + -center_attractor * particle.pos.y / self.dimensions.y
-                    + new_dir.y * delta,
-            });
+
+            // define an attractor at the center, so that every particle is eventually caught
+            let attractor_vector = Self::center_attractor_vector(&particle.pos, &self.dimensions);
+            // accelerate when approaching attractor
+            let attractor_force = VELOCITY_FIELD_ATTENUATION
+                * (0.2 / (0.2 + Vector::length(&attractor_vector).max(1.))
+                    + 0.5 * self.num_static_particles as f64 / MAX_STATIC as f64);
+            
+            // Importantly, field force affects particle density, which determines growth features
+
+            particle.vel = Vector::normalize(
+                particle.vel
+                    // velocity changes according to delta, but is always normalized afterwards
+                    + Vector::normalize(attractor_vector * attractor_force + new_dir) * delta,
+            );
         }
     }
 

@@ -15,6 +15,7 @@
 */
 
 use wasm_bindgen::prelude::*;
+use std::ops::{Add, AddAssign, Sub, Mul};
 
 /// Vector
 #[wasm_bindgen]
@@ -25,12 +26,16 @@ pub struct Vector {
 }
 
 impl Vector {
-    pub fn normalize(v: &Vector) -> Vector {
+    pub fn normalize(v: Vector) -> Vector {
         let len = 1. / (v.x * v.x + v.y * v.y).sqrt();
         Vector {
             x: v.x * len,
             y: v.y * len,
         }
+    }
+
+    pub fn length(v: &Vector) -> f64 {
+        (v.x * v.x + v.y * v.y).sqrt()
     }
 
     pub fn distance_squared(one: &Vector, other: &Vector) -> f64 {
@@ -48,5 +53,35 @@ impl Vector {
             x: to.x - from.x,
             y: to.y - from.y,
         }
+    }
+}
+
+impl Add for Vector {
+    type Output = Self;
+
+    fn add(self, other: Self) -> Self {
+        Self { x: self.x + other.x, y: self.y + other.y }
+    }
+}
+impl AddAssign for Vector {
+    fn add_assign(&mut self, other: Self) {
+        *self = Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        };
+    }
+}
+impl Sub for Vector {
+    type Output = Self;
+
+    fn sub(self, other: Self) -> Self {
+        Self { x: self.x - other.x, y: self.y - other.y }
+    }
+}
+impl Mul<f64> for Vector {
+    type Output = Self;
+
+    fn mul(self, scalar: f64) -> Self {
+        Self { x: self.x * scalar, y: self.y * scalar }
     }
 }

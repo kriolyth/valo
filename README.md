@@ -27,7 +27,7 @@ wasm-pack build
 3. Download / update npm dependencies
 ```
 cd www
-npm ci
+npm install
 ```
 
 4. Start in dev mode
@@ -43,6 +43,8 @@ npm run build
 ## Usage
 
 Add two spoonfuls of colour. Stir, enjoy.
+
+[Demo](https://kriolyth.github.io/valo/)
 
 ## License
 
