@@ -169,6 +169,10 @@ impl BindingConfiguration {
     fn is_port_attachable(&self, port: usize) -> bool {
         self.attachment_site_mask & (1 << port) != 0
     }
+
+    pub fn close_enough_to_bind(&self, pos1: &Vector, pos2: &Vector) -> bool {
+        Vector::distance_squared(pos1, pos2) <= self.radius * self.radius
+    }
 }
 
 #[derive(Copy, Clone, PartialEq)]
@@ -187,7 +191,7 @@ impl BindingResult {
         mp_bind_cfg: &BindingConfiguration,
         sp_bind_cfg: &BindingConfiguration,
     ) -> Option<BindingResult> {
-        if Vector::distance_squared(&mp.pos, &sp.pos) > sp_bind_cfg.radius * sp_bind_cfg.radius {
+        if !sp_bind_cfg.close_enough_to_bind(&mp.pos, &sp.pos) {
             return None;
         }
         let diff_to_mp = Vector::diff(&mp.pos, &sp.pos);

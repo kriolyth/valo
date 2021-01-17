@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
+use std::ops::{Add, AddAssign, Mul, Sub};
 use wasm_bindgen::prelude::*;
-use std::ops::{Add, AddAssign, Sub, Mul};
 
 /// Vector
 #[wasm_bindgen]
@@ -25,7 +25,13 @@ pub struct Vector {
     pub y: f64,
 }
 
+#[wasm_bindgen]
 impl Vector {
+    #[wasm_bindgen(constructor)]
+    pub fn new(x: f64, y: f64) -> Vector {
+        Vector { x, y }
+    }
+
     pub fn normalize(v: Vector) -> Vector {
         let len = 1. / (v.x * v.x + v.y * v.y).sqrt();
         Vector {
@@ -60,7 +66,10 @@ impl Add for Vector {
     type Output = Self;
 
     fn add(self, other: Self) -> Self {
-        Self { x: self.x + other.x, y: self.y + other.y }
+        Self {
+            x: self.x + other.x,
+            y: self.y + other.y,
+        }
     }
 }
 impl AddAssign for Vector {
@@ -75,13 +84,19 @@ impl Sub for Vector {
     type Output = Self;
 
     fn sub(self, other: Self) -> Self {
-        Self { x: self.x - other.x, y: self.y - other.y }
+        Self {
+            x: self.x - other.x,
+            y: self.y - other.y,
+        }
     }
 }
 impl Mul<f64> for Vector {
     type Output = Self;
 
     fn mul(self, scalar: f64) -> Self {
-        Self { x: self.x * scalar, y: self.y * scalar }
+        Self {
+            x: self.x * scalar,
+            y: self.y * scalar,
+        }
     }
 }
