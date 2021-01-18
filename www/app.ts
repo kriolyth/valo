@@ -58,7 +58,7 @@ class App {
         }
 
         // add a center particle
-        // this.field.add_static_particle(new wasm.Vector(0., 0.))
+        this.field.add_static_particle(new wasm.Vector(0., 0.))
 
         this.pixi.stage.addChild(this.movingParticlesContainer)
         this.pixi.stage.addChild(this.staticParticlesContainer)
