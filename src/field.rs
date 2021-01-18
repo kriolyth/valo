@@ -28,6 +28,19 @@ const MAX_STATIC: usize = 5000;
 /// Field force, different at every point, is multiplied by this constant
 const VELOCITY_FIELD_ATTENUATION: f64 = 1.0;
 
+/// Result for attachment possibility check
+/// To implement a custom starting static particle placement, we should be able
+/// to arbitrarily position new static particles. However, to maintain a grid,
+/// we must also go over standard attachment procdure in case other particles are
+/// already there. This means that "no particles to attach to" and
+/// "there are particles, but they are all busy" are different answers to the question
+/// of whether a new static particle can be added at a specified location
+enum AttachmentCheckResult {
+    Ok(usize, BindingResult),
+    SitesBusy,
+    NoOtherParticle,
+}
+
 /// Renderable field
 /// TODO:
 /// 1. Multiple particle types (per bind point configuration)
@@ -95,7 +108,7 @@ impl Field {
                 y: half_height,
             },
             num_moving_particles: 0,
-            num_static_particles: 1,
+            num_static_particles: 0,
         }
     }
 
@@ -133,6 +146,46 @@ impl Field {
                 flags: 0,
             };
             self.num_moving_particles += 1
+        }
+    }
+
+    /// try adding a static particle directly (with respect to binding sites)
+    pub fn add_static_particle(&mut self, pos: Vector) -> bool {
+        if self.num_moving_particles >= MAX_MOVING || self.num_static_particles >= MAX_STATIC {
+            return false;
+        }
+        // to align added particles, we need to treat them as moving first and then convert them to static
+        let vel = Field::random_vel_in_field();
+        self.moving_particles[self.num_moving_particles] = MovingParticle {
+            pos,
+            vel,
+            since: 0.,
+            flags: 0,
+        };
+        self.num_moving_particles += 1;
+
+        match self.check_single_particle_attachment(self.num_moving_particles - 1) {
+            AttachmentCheckResult::Ok(index_static, binding) => {
+                // apply binding
+                self.convert_particle_to_static(
+                    self.num_moving_particles - 1,
+                    index_static,
+                    binding,
+                );
+                true
+            }
+            AttachmentCheckResult::NoOtherParticle => {
+                // no other static particles found in vicinity, just create a new one
+                self.static_particles[self.num_static_particles] = StaticParticle {
+                    pos,
+                    rot: 0.,
+                    binding_cfg_id: 0,
+                };
+                self.num_static_particles += 1;
+                self.num_moving_particles -= 1;
+                true
+            }
+            AttachmentCheckResult::SitesBusy => false,
         }
     }
 
@@ -191,7 +244,6 @@ impl Field {
             let attractor_force = VELOCITY_FIELD_ATTENUATION
                 * (0.2 / (0.2 + Vector::length(&attractor_vector).max(1.))
                     + 0.5 * self.num_static_particles as f64 / MAX_STATIC as f64);
-            
             // Importantly, field force affects particle density, which determines growth features
 
             particle.vel = Vector::normalize(
@@ -209,7 +261,7 @@ impl Field {
         let mut n_results = 0;
         let bind_cfg = &self.bind_cfgs[0];
 
-        'outer: for (index, &moving) in self
+        'outer: for (index, moving) in self
             .moving_particles
             .iter()
             .enumerate()
@@ -222,7 +274,7 @@ impl Field {
                 .take(self.num_static_particles)
             {
                 if let Some(binding) =
-                    BindingResult::get_binding(&moving, &fixed, bind_cfg, bind_cfg)
+                    BindingResult::get_binding(&moving, fixed, bind_cfg, bind_cfg)
                 {
                     result[n_results] = (index, index_static, Some(binding));
                     n_results += 1;
@@ -234,6 +286,34 @@ impl Field {
             }
         }
         result
+    }
+
+    /// test particles that can attach and return a list of their indices
+    /// (note the limits - at most 4 particles are returned per call)
+    fn check_single_particle_attachment(&self, index_moving: usize) -> AttachmentCheckResult {
+        let bind_cfg = &self.bind_cfgs[0];
+
+        let moving = &self.moving_particles[index_moving];
+        let closest_static_particles: Vec<(usize, &StaticParticle)> = self
+            .static_particles
+            .iter()
+            .enumerate()
+            .take(self.num_static_particles)
+            .filter(|(_index_static, fixed)| bind_cfg.close_enough_to_bind(&fixed.pos, &moving.pos))
+            .collect();
+        if closest_static_particles.is_empty() {
+            return AttachmentCheckResult::NoOtherParticle;
+        }
+
+        closest_static_particles
+            .iter()
+            .find_map(|(index_static, fixed)| {
+                BindingResult::get_binding(moving, fixed, bind_cfg, bind_cfg)
+                    .map_or(None, |r: BindingResult| {
+                        Some(AttachmentCheckResult::Ok(*index_static, r))
+                    })
+            })
+            .unwrap_or(AttachmentCheckResult::SitesBusy)
     }
 
     /// update attachments and particles disposition
@@ -255,9 +335,32 @@ mod tests {
     use super::*;
     use wasm_bindgen_test::*;
 
+    impl std::fmt::Debug for Vector {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            fmt.debug_struct("Vector")
+                .field("x", &self.x)
+                .field("y", &self.y)
+                .finish()
+        }
+    }
+
+    impl std::fmt::Debug for StaticParticle {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(
+                fmt,
+                "StaticParticle {{ ports: {:#06b}, pos: {:?} }})",
+                &(self.binding_cfg_id >> 32),
+                &self.pos
+            )
+        }
+    }
+
     #[wasm_bindgen_test]
     fn attachment() {
         let mut f = Field::new(10., 10.);
+        f.bind_cfgs[0] = BindingConfiguration::make_square();
+        assert!(f.add_static_particle(Vector::new(0., 0.)));
+
         let d = Vector { x: 1.0, y: 0.0 };
         f.moving_particles[0] = MovingParticle {
             pos: Vector { x: 1.0, y: 0.0 },
@@ -303,6 +406,9 @@ mod tests {
     #[wasm_bindgen_test]
     fn attachment_multi() {
         let mut f = Field::new(10., 10.);
+        f.bind_cfgs[0] = BindingConfiguration::make_square();
+        assert!(f.add_static_particle(Vector::new(0., 0.)));
+
         let d = Vector { x: 1.0, y: 0.0 };
         f.static_particles[1] = StaticParticle {
             pos: Vector { x: 1.0, y: 0.0 },
@@ -339,5 +445,35 @@ mod tests {
 
         let att = f.check_attachment();
         assert_eq!(att[0].0, MAX_MOVING);
+    }
+
+    #[wasm_bindgen_test]
+    fn custom_initial_static() {
+        let mut f = Field::new(10., 10.);
+        f.bind_cfgs[0] = BindingConfiguration::make_square();
+        f.bind_cfgs[0].set_max_binds(2);
+        f.bind_cfgs[0].set_radius(std::f64::consts::SQRT_2);
+        // arrange 4 particles in a square, connected on sides
+        assert!(f.add_static_particle(Vector::new(1., 0.)));
+        assert_eq!(f.num_static_particles, 1);
+        assert!(f.add_static_particle(Vector::new(0., 1.)));
+        assert_eq!(f.num_static_particles, 2);
+        assert!(f.add_static_particle(Vector::new(-1., 0.)));
+        assert_eq!(f.num_static_particles, 3);
+        assert!(f.add_static_particle(Vector::new(0., -1.)));
+        assert_eq!(f.num_static_particles, 4);
+
+        // Currently binds only occur on one particle (tree structure, not grid),
+        // which leaves a way to add new particles even when there is seemingly no place for them.
+        // So here for the particle to be rejected here we rely on ports busy, rather than binds
+        assert!(
+            !f.add_static_particle(Vector::new(0.1, 0.1)),
+            "{:?} {:?} {:?} {:?}",
+            f.static_particles[0],
+            f.static_particles[1],
+            f.static_particles[2],
+            f.static_particles[3]
+        );
+        assert_eq!(f.num_static_particles, 4);
     }
 }
