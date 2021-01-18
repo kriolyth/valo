@@ -184,6 +184,18 @@ class Field {
         _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.field_add_boundary_particle(this.ptr, since);
     }
     /**
+    * try adding a static particle directly (with respect to binding sites)
+    * @param {Vector} pos
+    * @returns {boolean}
+    */
+    add_static_particle(pos) {
+        _assertClass(pos, Vector);
+        var ptr0 = pos.ptr;
+        pos.ptr = 0;
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.field_add_static_particle(this.ptr, ptr0);
+        return ret !== 0;
+    }
+    /**
     * update particle positions according to time delta
     * @param {number} delta
     */
@@ -415,6 +427,67 @@ class Vector {
     set y(arg0) {
         _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_vector_y(this.ptr, arg0);
     }
+    /**
+    * @param {number} x
+    * @param {number} y
+    */
+    constructor(x, y) {
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.vector_new(x, y);
+        return Vector.__wrap(ret);
+    }
+    /**
+    * @param {Vector} v
+    * @returns {Vector}
+    */
+    static normalize(v) {
+        _assertClass(v, Vector);
+        var ptr0 = v.ptr;
+        v.ptr = 0;
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.vector_normalize(ptr0);
+        return Vector.__wrap(ret);
+    }
+    /**
+    * @param {Vector} v
+    * @returns {number}
+    */
+    static length(v) {
+        _assertClass(v, Vector);
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.vector_length(v.ptr);
+        return ret;
+    }
+    /**
+    * @param {Vector} one
+    * @param {Vector} other
+    * @returns {number}
+    */
+    static distance_squared(one, other) {
+        _assertClass(one, Vector);
+        _assertClass(other, Vector);
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.vector_distance_squared(one.ptr, other.ptr);
+        return ret;
+    }
+    /**
+    * @param {Vector} one
+    * @param {Vector} other
+    * @returns {number}
+    */
+    static dot(one, other) {
+        _assertClass(one, Vector);
+        _assertClass(other, Vector);
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.vector_dot(one.ptr, other.ptr);
+        return ret;
+    }
+    /**
+    * @param {Vector} to
+    * @param {Vector} from
+    * @returns {Vector}
+    */
+    static diff(to, from) {
+        _assertClass(to, Vector);
+        _assertClass(from, Vector);
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.vector_diff(to.ptr, from.ptr);
+        return Vector.__wrap(ret);
+    }
 }
 
 const __wbg_random_c481bfb857abeff2 = typeof Math.random == 'function' ? Math.random : notDefined('Math.random');
@@ -464,6 +537,7 @@ const __wbindgen_throw = function(arg0, arg1) {
 /*! export __wbindgen_start [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_add_boundary_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_add_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export field_add_static_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_moving_particles_ptr [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_new [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_static_particles_ptr [provided] [no usage info] [provision prevents renaming (no use info)] */
@@ -475,6 +549,12 @@ const __wbindgen_throw = function(arg0, arg1) {
 /*! export main [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export memory [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export movingparticle_get_f64_size [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export vector_diff [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export vector_distance_squared [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export vector_dot [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export vector_length [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export vector_new [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export vector_normalize [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, module, module.id, __webpack_require__.w, __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
 /***/ ((module, exports, __webpack_require__) => {
@@ -555,7 +635,7 @@ var App = /** @class */ (function () {
         var _this = this;
         app.pixi.loader.add([
             { name: 'particle', url: 'images/particle.png' }
-        ]).load(function () { return _this.setup(); });
+        ]).load(function () { _this.setup(); });
     };
     /// field setup
     App.prototype.setup = function () {
@@ -563,6 +643,8 @@ var App = /** @class */ (function () {
         for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.startParticles; i++) {
             this.field.add_particle();
         }
+        // add a center particle
+        this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(0., 0.));
         this.pixi.stage.addChild(this.movingParticlesContainer);
         this.pixi.stage.addChild(this.staticParticlesContainer);
         // set particle displays to (0,0) in the center
@@ -609,6 +691,19 @@ var App = /** @class */ (function () {
     };
     App.prototype.reset = function () {
         this.field = new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Field(_config__WEBPACK_IMPORTED_MODULE_1__.default.field.width, _config__WEBPACK_IMPORTED_MODULE_1__.default.field.height);
+    };
+    App.prototype.randomField = function () {
+        var mirrors = 3 + Math.trunc(Math.random() * 4);
+        var pts = 1 + Math.trunc(mirrors / 2) + Math.trunc(Math.random() * (6 - mirrors / 2));
+        for (var i = 0; i < pts; i++) {
+            var th = Math.random() * Math.PI * 2;
+            var r = (.2 + Math.random()) * ((i + 1) * .5 / pts) * _config__WEBPACK_IMPORTED_MODULE_1__.default.field.width;
+            for (var m = 0; m < mirrors; m++) {
+                var x = Math.sin(th + m * 2 * Math.PI / mirrors);
+                var y = Math.cos(th + m * 2 * Math.PI / mirrors);
+                this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(x * r, y * r));
+            }
+        }
     };
     return App;
 }());
