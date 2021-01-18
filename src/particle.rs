@@ -77,6 +77,9 @@ impl StaticParticle {
     fn is_port_free(&self, port: u8) -> bool {
         self.binding_cfg_id & (1u64 << (32 + port)) == 0
     }
+    fn count_busy_ports(&self) -> u8 {
+        (self.binding_cfg_id & (255u64 << 32)).count_ones() as u8
+    }
     fn set_port_busy(&mut self, port: u8) {
         self.binding_cfg_id |= 1u64 << (32 + port);
     }
@@ -147,6 +150,13 @@ impl BindingConfiguration {
         }
     }
 
+    pub fn set_max_binds(&mut self, max_binds: u8) {
+        self.max_binds = max_binds;
+    }
+    pub fn set_radius(&mut self, radius: f64) {
+        self.radius = radius;
+    }
+
     fn angle_to_port(&self, angle: f64) -> Option<usize> {
         let mut start = 0f64;
         let circle_angle = angle.rem_euclid(360.);
@@ -171,7 +181,7 @@ impl BindingConfiguration {
     }
 
     pub fn close_enough_to_bind(&self, pos1: &Vector, pos2: &Vector) -> bool {
-        Vector::distance_squared(pos1, pos2) <= self.radius * self.radius
+        Vector::distance_squared(pos1, pos2) <= (self.radius * self.radius * 1.0000001)
     }
 }
 
@@ -191,7 +201,7 @@ impl BindingResult {
         mp_bind_cfg: &BindingConfiguration,
         sp_bind_cfg: &BindingConfiguration,
     ) -> Option<BindingResult> {
-        if !sp_bind_cfg.close_enough_to_bind(&mp.pos, &sp.pos) {
+        if !sp_bind_cfg.close_enough_to_bind(&mp.pos, &sp.pos) || sp.count_busy_ports() >= sp_bind_cfg.max_binds {
             return None;
         }
         let diff_to_mp = Vector::diff(&mp.pos, &sp.pos);
@@ -266,7 +276,7 @@ impl BindingResult {
         sp_bind_cfg: &BindingConfiguration,
     ) -> Option<StaticParticle> {
         // safety check, silently fail if a particle cannot be attached
-        if !sp.is_port_free(self.site_at_static) {
+        if !sp.is_port_free(self.site_at_static) || sp.count_busy_ports() >= sp_bind_cfg.max_binds {
             return None;
         }
         sp.set_port_busy(self.site_at_static);

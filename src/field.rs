@@ -154,6 +154,7 @@ impl Field {
         if self.num_moving_particles >= MAX_MOVING || self.num_static_particles >= MAX_STATIC {
             return false;
         }
+        // to align added particles, we need to treat them as moving first and then convert them to static
         let vel = Field::random_vel_in_field();
         self.moving_particles[self.num_moving_particles] = MovingParticle {
             pos,
@@ -162,7 +163,7 @@ impl Field {
             flags: 0,
         };
         self.num_moving_particles += 1;
-        // self.convert_particle_to_static(moving_particle_idx: usize, static_particle_idx: usize, binding_result: BindingResult)
+
         match self.check_single_particle_attachment(self.num_moving_particles - 1) {
             AttachmentCheckResult::Ok(index_static, binding) => {
                 // apply binding
@@ -272,7 +273,8 @@ impl Field {
                 .enumerate()
                 .take(self.num_static_particles)
             {
-                if let Some(binding) = BindingResult::get_binding(&moving, fixed, bind_cfg, bind_cfg)
+                if let Some(binding) =
+                    BindingResult::get_binding(&moving, fixed, bind_cfg, bind_cfg)
                 {
                     result[n_results] = (index, index_static, Some(binding));
                     n_results += 1;
@@ -333,10 +335,32 @@ mod tests {
     use super::*;
     use wasm_bindgen_test::*;
 
+    impl std::fmt::Debug for Vector {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            fmt.debug_struct("Vector")
+                .field("x", &self.x)
+                .field("y", &self.y)
+                .finish()
+        }
+    }
+
+    impl std::fmt::Debug for StaticParticle {
+        fn fmt(&self, fmt: &mut std::fmt::Formatter) -> std::fmt::Result {
+            write!(
+                fmt,
+                "StaticParticle {{ ports: {:#06b}, pos: {:?} }})",
+                &(self.binding_cfg_id >> 32),
+                &self.pos
+            )
+        }
+    }
+
     #[wasm_bindgen_test]
     fn attachment() {
         let mut f = Field::new(10., 10.);
+        f.bind_cfgs[0] = BindingConfiguration::make_square();
         assert!(f.add_static_particle(Vector::new(0., 0.)));
+
         let d = Vector { x: 1.0, y: 0.0 };
         f.moving_particles[0] = MovingParticle {
             pos: Vector { x: 1.0, y: 0.0 },
@@ -382,7 +406,9 @@ mod tests {
     #[wasm_bindgen_test]
     fn attachment_multi() {
         let mut f = Field::new(10., 10.);
+        f.bind_cfgs[0] = BindingConfiguration::make_square();
         assert!(f.add_static_particle(Vector::new(0., 0.)));
+
         let d = Vector { x: 1.0, y: 0.0 };
         f.static_particles[1] = StaticParticle {
             pos: Vector { x: 1.0, y: 0.0 },
@@ -419,5 +445,35 @@ mod tests {
 
         let att = f.check_attachment();
         assert_eq!(att[0].0, MAX_MOVING);
+    }
+
+    #[wasm_bindgen_test]
+    fn custom_initial_static() {
+        let mut f = Field::new(10., 10.);
+        f.bind_cfgs[0] = BindingConfiguration::make_square();
+        f.bind_cfgs[0].set_max_binds(2);
+        f.bind_cfgs[0].set_radius(std::f64::consts::SQRT_2);
+        // arrange 4 particles in a square, connected on sides
+        assert!(f.add_static_particle(Vector::new(1., 0.)));
+        assert_eq!(f.num_static_particles, 1);
+        assert!(f.add_static_particle(Vector::new(0., 1.)));
+        assert_eq!(f.num_static_particles, 2);
+        assert!(f.add_static_particle(Vector::new(-1., 0.)));
+        assert_eq!(f.num_static_particles, 3);
+        assert!(f.add_static_particle(Vector::new(0., -1.)));
+        assert_eq!(f.num_static_particles, 4);
+
+        // Currently binds only occur on one particle (tree structure, not grid),
+        // which leaves a way to add new particles even when there is seemingly no place for them.
+        // So here for the particle to be rejected here we rely on ports busy, rather than binds
+        assert!(
+            !f.add_static_particle(Vector::new(0.1, 0.1)),
+            "{:?} {:?} {:?} {:?}",
+            f.static_particles[0],
+            f.static_particles[1],
+            f.static_particles[2],
+            f.static_particles[3]
+        );
+        assert_eq!(f.num_static_particles, 4);
     }
 }
