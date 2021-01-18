@@ -48,7 +48,7 @@ class App {
     load() {
         app.pixi.loader.add([
             { name: 'particle', url: 'images/particle.png' }
-        ]).load(() => this.setup());
+        ]).load(() => { this.setup() });
     }
 
     /// field setup
@@ -58,7 +58,7 @@ class App {
         }
 
         // add a center particle
-        this.field.add_static_particle(new wasm.Vector(0., 0.))
+        // this.field.add_static_particle(new wasm.Vector(0., 0.))
 
         this.pixi.stage.addChild(this.movingParticlesContainer)
         this.pixi.stage.addChild(this.staticParticlesContainer)
@@ -125,6 +125,21 @@ class App {
 
     reset() {
         this.field = new wasm.Field(config.field.width, config.field.height);
+    }
+
+    randomField() {
+        const mirrors = 3 + Math.trunc(Math.random() * 4)
+        const pts = 1 + Math.trunc(mirrors/2) + Math.trunc(Math.random() * (6 - mirrors/2))
+
+        for (let i = 0; i < pts; i++) {
+            const th = Math.random() * Math.PI * 2;
+            const r = (.2 + Math.random()) * ((i+1)*.5/pts) * config.field.width;
+            for (let m = 0; m < mirrors; m++) {
+                const x = Math.sin(th + m * 2 * Math.PI / mirrors)
+                const y = Math.cos(th + m * 2 * Math.PI / mirrors)
+                this.field.add_static_particle(new wasm.Vector(x * r, y * r));
+            }
+        }
     }
 }
 
