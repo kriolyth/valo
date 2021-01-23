@@ -28,6 +28,9 @@ class App {
     fieldBorder: PIXI.Graphics;
     simulationTimeStart: number;
 
+    paused: boolean;
+    ready: boolean;
+
     constructor() {
         this.field = new wasm.Field(config.field.width, config.field.height);
         this.pixi = new PIXI.Application({
@@ -42,6 +45,8 @@ class App {
         this.pixi.ticker.maxFPS = config.display.maxfps;
 
         this.simulationTimeStart = (new Date()).getTime();
+        this.ready = false;
+        this.paused = false;
     }
 
     /// load resources
@@ -53,13 +58,6 @@ class App {
 
     /// field setup
     setup() {
-        for (let i = 0; i < config.field.startParticles; i++) {
-            this.field.add_particle()
-        }
-
-        // add a center particle
-        this.field.add_static_particle(new wasm.Vector(0., 0.))
-
         this.pixi.stage.addChild(this.movingParticlesContainer)
         this.pixi.stage.addChild(this.staticParticlesContainer)
 
@@ -90,28 +88,33 @@ class App {
         this.pixi.stage.mask = fieldMask
 
         app.pixi.ticker.add(delta => this.loop(delta));
+
+        this.start();
     }
 
     /// draw loop
     loop(delta: number) {
+
         updateVisibleParticles();
+        
+        if (this.ready && !this.paused) {
+            for (let tick = 0; tick < config.field.ticksPerCall; tick++) {
+                this.field.update_attachments();
 
-        for (let tick = 0; tick < config.field.ticksPerCall; tick++) {
-            this.field.update_attachments();
-            
-            // Moving particles have velocities; this is how fast their positions changes in velocity direction
-            this.field.update_positions(0.75);
+                // Moving particles have velocities; this is how fast their positions changes in velocity direction
+                this.field.update_positions(0.75);
 
-            // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
-            this.field.update_velocities(0.8);
+                // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
+                this.field.update_velocities(0.8);
 
-            if (this.field.num_moving_particles + this.field.num_static_particles < config.field.maxParticles) {
-                // additional spawn rate from consumed particles
-                const addSpawnRate = this.field.num_static_particles / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
-                // probability of spawn event happening in the last frame
-                const expInterval = Math.exp(-(addSpawnRate + config.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
-                if (Math.random() > expInterval) {
-                    this.field.add_boundary_particle(this.pixi.ticker.lastTime);
+                if (this.field.num_moving_particles + this.field.num_static_particles < config.field.maxParticles) {
+                    // additional spawn rate from consumed particles
+                    const addSpawnRate = this.field.num_static_particles / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
+                    // probability of spawn event happening in the last frame
+                    const expInterval = Math.exp(-(addSpawnRate + config.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
+                    if (Math.random() > expInterval) {
+                        this.field.add_boundary_particle(this.pixi.ticker.lastTime);
+                    }
                 }
             }
         }
@@ -123,17 +126,52 @@ class App {
 
     }
 
+    /// Reset the simulation
     reset() {
         this.field = new wasm.Field(config.field.width, config.field.height);
+        this.ready = false;
+    }
+
+    /// Start a new simulation
+    start() {
+
+        // add a bunch of movers
+        for (let i = 0; i < config.field.startParticles; i++) {
+            this.field.add_particle()
+        }
+
+        // add a center particle
+        if (this.field.num_static_particles == 0)
+            this.field.add_static_particle(new wasm.Vector(0., 0.))
+
+        this.ready = true;
+        this.resume();
+    }
+
+    /// Pause a currently active simulation
+    pause() {
+        // this.pixi.stop()
+        this.paused = true
+    }
+    /// Resume a currently active simulation
+    resume() {
+        this.paused = false
+        // this.pixi.start()
+    }
+    isPaused() {
+        return this.paused
+    }
+    isReady() {
+        return this.ready
     }
 
     randomField() {
         const mirrors = 3 + Math.trunc(Math.random() * 4)
-        const pts = 1 + Math.trunc(mirrors/2) + Math.trunc(Math.random() * (6 - mirrors/2))
+        const pts = 1 + Math.trunc(mirrors / 2) + Math.trunc(Math.random() * (6 - mirrors / 2))
 
         for (let i = 0; i < pts; i++) {
             const th = Math.random() * Math.PI * 2;
-            const r = (.2 + Math.random()) * ((i+1)*.5/pts) * config.field.width;
+            const r = (.2 + Math.random()) * ((i + 1) * .5 / pts) * config.field.width;
             for (let m = 0; m < mirrors; m++) {
                 const x = Math.sin(th + m * 2 * Math.PI / mirrors)
                 const y = Math.cos(th + m * 2 * Math.PI / mirrors)
