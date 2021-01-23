@@ -44,6 +44,12 @@ document.getElementById("play-pause")?.addEventListener("click", () => {
         pp.innerHTML = 'Pause'
     }
 })
+document.getElementById("view")?.addEventListener("mousemove", (ev: MouseEvent) => {
+    if (!app.isReady() && (ev.buttons & 1)) {
+        // drawing mode: not running, mouse button pressed
+        app.addCustomParticle(ev.offsetX, ev.offsetY)
+    }
+})
 
 window.setInterval(() => {
     const elFps = document.getElementById('fps');

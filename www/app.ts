@@ -165,6 +165,14 @@ class App {
         return this.ready
     }
 
+    addCustomParticle(viewX: number, viewY: number) {
+        const px = ((viewX / config.display.width) - 0.5) * 2;
+        const py = ((viewY / config.display.height) - 0.5) * 2;
+        // add particles within some safe distance from border
+        if (px*px + py*py < 0.85)
+            this.field.add_static_particle(new wasm.Vector(px * config.field.width, py * config.field.height))
+    }
+
     randomField() {
         const mirrors = 3 + Math.trunc(Math.random() * 4)
         const pts = 1 + Math.trunc(mirrors / 2) + Math.trunc(Math.random() * (6 - mirrors / 2))
