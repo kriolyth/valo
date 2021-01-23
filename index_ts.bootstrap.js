@@ -722,6 +722,13 @@ var App = /** @class */ (function () {
     App.prototype.isReady = function () {
         return this.ready;
     };
+    App.prototype.addCustomParticle = function (viewX, viewY) {
+        var px = ((viewX / _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width) - 0.5) * 2;
+        var py = ((viewY / _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height) - 0.5) * 2;
+        // add particles within some safe distance from border
+        if (px * px + py * py < 0.85)
+            this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(px * _config__WEBPACK_IMPORTED_MODULE_1__.default.field.width, py * _config__WEBPACK_IMPORTED_MODULE_1__.default.field.height));
+    };
     App.prototype.randomField = function () {
         var mirrors = 3 + Math.trunc(Math.random() * 4);
         var pts = 1 + Math.trunc(mirrors / 2) + Math.trunc(Math.random() * (6 - mirrors / 2));
@@ -968,7 +975,7 @@ __webpack_require__.r(__webpack_exports__);
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-var _a, _b, _c;
+var _a, _b, _c, _d;
 
 _app__WEBPACK_IMPORTED_MODULE_0__.app.load();
 // bind app to DOM
@@ -995,6 +1002,12 @@ _app__WEBPACK_IMPORTED_MODULE_0__.app.load();
     else if (!_app__WEBPACK_IMPORTED_MODULE_0__.app.isReady()) {
         _app__WEBPACK_IMPORTED_MODULE_0__.app.start();
         pp.innerHTML = 'Pause';
+    }
+});
+(_d = document.getElementById("view")) === null || _d === void 0 ? void 0 : _d.addEventListener("mousemove", function (ev) {
+    if (!_app__WEBPACK_IMPORTED_MODULE_0__.app.isReady() && (ev.buttons & 1)) {
+        // drawing mode: not running, mouse button pressed
+        _app__WEBPACK_IMPORTED_MODULE_0__.app.addCustomParticle(ev.offsetX, ev.offsetY);
     }
 });
 window.setInterval(function () {
