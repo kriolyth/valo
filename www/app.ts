@@ -51,7 +51,7 @@ class App {
 
     /// load resources
     load() {
-        app.pixi.loader.add([
+        this.pixi.loader.add([
             { name: 'particle', url: 'images/particle.png' }
         ]).load(() => { this.setup() });
     }
@@ -78,7 +78,7 @@ class App {
         // field ui
         this.fieldBorder.lineStyle(4, config.colours.tintMoving, 1.0)
         this.fieldBorder.drawCircle(config.display.width / 2, config.display.height / 2, config.display.height / 2 - 4)
-        app.pixi.stage.addChild(this.fieldBorder)
+        this.pixi.stage.addChild(this.fieldBorder)
 
         let fieldMask = new PIXI.Graphics()
         fieldMask.lineStyle(0)
@@ -87,7 +87,7 @@ class App {
         fieldMask.endFill()
         this.pixi.stage.mask = fieldMask
 
-        app.pixi.ticker.add(delta => this.loop(delta));
+        this.pixi.ticker.add(delta => this.loop(delta));
 
         this.start();
     }
@@ -144,6 +144,7 @@ class App {
         if (this.field.num_static_particles == 0)
             this.field.add_static_particle(new wasm.Vector(0., 0.))
 
+        this.simulationTimeStart = (new Date()).getTime();
         this.ready = true;
         this.resume();
     }
@@ -189,6 +190,11 @@ class App {
     }
 }
 
-const app = new App;
+let app: App;
 
-export { app }
+function createApp() {
+    app = new App()
+    return app
+}
+
+export { createApp, app }
