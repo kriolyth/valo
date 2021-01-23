@@ -20,8 +20,8 @@
   "author": "Krio Lyth <kriolyth@gmail.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "valo": "file:../pkg",
-    "pixi.js": "^5.3.3"
+    "pixi.js": "^5.3.3",
+    "valo": "file:../pkg"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^6.3.0",

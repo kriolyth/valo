@@ -15,32 +15,68 @@
    limitations under the License.
 -->
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Valo</title>
-    <script src="https://pixijs.download/v5.4.0-rc.1/pixi.min.js"></script>
-    <style>
-      body {
-        background-color: #2f2f2f;
-        color: #e3e3e3;
-        font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
-      }
-      #view {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-    </style>
-  </head>
-  <body>
-    <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
-    <script src="./bootstrap.js"></script>
-    <div id="view"></div>
-  </body>
+
+<head>
+  <meta charset="utf-8">
+  <title>Valo</title>
+  <script src="https://pixijs.download/v5.4.0-rc.1/pixi.min.js"></script>
+  <style>
+    body {
+      background-color: #2f2f2f;
+      color: #e3e3e3;
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    #grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #control-top {
+      height: 20px;
+    }
+
+    .btn {
+      display: inline-block;
+      border-bottom: 1px solid orange;
+      /* border-radius: 40px; */
+      /* width: 40px; height: 40px; */
+      padding: 10px;
+      cursor: pointer;
+      margin: 16px;
+
+      text-align: center;
+      font-size: larger;
+
+      opacity: 0.4;
+    }
+    .btn:hover {
+      opacity: 1.0;
+    }
+    #reset, #play-pause {
+      width: 50px;
+    }
+  </style>
+</head>
+
+<body>
+  <noscript>This page contains webassembly and javascript content, please enable javascript in your browser.</noscript>
+  <script src="./bootstrap.js"></script>
+  <div id="grid">
+    <dv id="control-top">
+    </dv>
+    <div id="control-left"></div><div id="view"></div><div id="control-right"></div>
+    <dv id="control-bottom">
+      <span class="btn" id="reset">Reset</span>
+      <span class="btn" id="play-pause">Pause</span>
+    </dv>
+  </div>
+</body>
+
 </html>

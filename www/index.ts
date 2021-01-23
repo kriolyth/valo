@@ -21,6 +21,30 @@ app.load();
 // bind app to DOM
 document.getElementById("view")?.appendChild(app.pixi.view);
 
+document.getElementById("reset")?.addEventListener("click", () => {
+    app.reset()
+    let pp = document.getElementById("play-pause");
+    if (pp) {
+        pp.innerHTML = 'Play'
+    }
+})
+document.getElementById("play-pause")?.addEventListener("click", () => {
+    let pp = document.getElementById("play-pause");
+    if (!pp)
+        return;
+    if (app.isReady() && app.isPaused()) {
+        app.resume();
+        pp.innerHTML = 'Pause'
+    }
+    else if (app.isReady() && !app.isPaused()) {
+        app.pause();
+        pp.innerHTML = 'Play'
+    } else if (!app.isReady()) {
+        app.start();
+        pp.innerHTML = 'Pause'
+    }
+})
+
 window.setInterval(() => {
     const elFps = document.getElementById('fps');
     if (elFps)
