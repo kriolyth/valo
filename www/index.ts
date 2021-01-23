@@ -14,46 +14,71 @@
    limitations under the License.
 */
 
-import { app } from './app';
-
-app.load();
+import { createApp } from './app';
+import config from './config';
 
 // bind app to DOM
-document.getElementById("view")?.appendChild(app.pixi.view);
+function bindApp() {
+    if (screen.width < config.display.width || screen.height < config.display.height) {
+        const dim = Math.min(screen.width - 24, screen.height - 60)
+        console.log(dim)
+        config.display.width = dim
+        config.display.height = dim
+    }
+    const app = createApp()
+    app.load();
 
-document.getElementById("reset")?.addEventListener("click", () => {
-    app.reset()
-    let pp = document.getElementById("play-pause");
-    if (pp) {
-        pp.innerHTML = 'Play'
-    }
-})
-document.getElementById("play-pause")?.addEventListener("click", () => {
-    let pp = document.getElementById("play-pause");
-    if (!pp)
-        return;
-    if (app.isReady() && app.isPaused()) {
-        app.resume();
-        pp.innerHTML = 'Pause'
-    }
-    else if (app.isReady() && !app.isPaused()) {
-        app.pause();
-        pp.innerHTML = 'Play'
-    } else if (!app.isReady()) {
-        app.start();
-        pp.innerHTML = 'Pause'
-    }
-})
-document.getElementById("view")?.addEventListener("mousemove", (ev: MouseEvent) => {
-    if (!app.isReady() && (ev.buttons & 1)) {
-        // drawing mode: not running, mouse button pressed
-        app.addCustomParticle(ev.offsetX, ev.offsetY)
-    }
-})
+    document.getElementById("view")?.appendChild(app.pixi.view);
 
-window.setInterval(() => {
-    const elFps = document.getElementById('fps');
-    if (elFps)
-        elFps.innerHTML = app.pixi.ticker.FPS.toFixed(0);
-}, 667);
+    document.getElementById("reset")?.addEventListener("click", () => {
+        app.reset()
+        let pp = document.getElementById("play-pause");
+        if (pp) {
+            pp.innerHTML = 'Play'
+        }
+    })
+    document.getElementById("play-pause")?.addEventListener("click", () => {
+        let pp = document.getElementById("play-pause");
+        if (!pp)
+            return;
+        if (app.isReady() && app.isPaused()) {
+            app.resume();
+            pp.innerHTML = 'Pause'
+        }
+        else if (app.isReady() && !app.isPaused()) {
+            app.pause();
+            pp.innerHTML = 'Play'
+        } else if (!app.isReady()) {
+            app.start();
+            pp.innerHTML = 'Pause'
+        }
+    })
+    document.getElementById("view")?.addEventListener("mousemove", (ev: MouseEvent) => {
+        if (!app.isReady() && (ev.buttons & 1)) {
+            // drawing mode: not running, mouse button pressed
+            app.addCustomParticle(ev.offsetX, ev.offsetY)
+        }
+    })
+    document.getElementById("view")?.addEventListener("touchmove", (ev: TouchEvent) => {
+        const rc = document.getElementById("view")?.getBoundingClientRect();
+        if (rc && !app.isReady()) {
+            // drawing mode: not running, touch active
+            for (let touch of Array.from(ev.touches)) {
+                const px = touch.clientX - rc.left
+                const py = touch.clientY - rc.top
+                app.addCustomParticle(px, py)
+            }
+        }
+    })
+
+
+    window.setInterval(() => {
+        const elFps = document.getElementById('fps');
+        if (elFps)
+            elFps.innerHTML = app.pixi.ticker.FPS.toFixed(0);
+    }, 667);
+}
+
+if (document.readyState !== 'loading') bindApp()
+else window.addEventListener('DOMContentLoaded', bindApp)
 
