@@ -581,6 +581,7 @@ wasmExports[""]()
   \****************/
 /*! namespace exports */
 /*! export app [provided] [no usage info] [missing usage info prevents renaming] */
+/*! export createApp [provided] [no usage info] [missing usage info prevents renaming] */
 /*! other exports [not provided] [no usage info] */
 /*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
@@ -588,6 +589,7 @@ wasmExports[""]()
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createApp": () => /* binding */ createApp,
 /* harmony export */   "app": () => /* binding */ app
 /* harmony export */ });
 /* harmony import */ var _pkg_valo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../pkg/valo */ "../pkg/valo_bg.js");
@@ -635,7 +637,7 @@ var App = /** @class */ (function () {
     /// load resources
     App.prototype.load = function () {
         var _this = this;
-        app.pixi.loader.add([
+        this.pixi.loader.add([
             { name: 'particle', url: 'images/particle.png' }
         ]).load(function () { _this.setup(); });
     };
@@ -653,14 +655,14 @@ var App = /** @class */ (function () {
         // field ui
         this.fieldBorder.lineStyle(4, _config__WEBPACK_IMPORTED_MODULE_1__.default.colours.tintMoving, 1.0);
         this.fieldBorder.drawCircle(_config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2 - 4);
-        app.pixi.stage.addChild(this.fieldBorder);
+        this.pixi.stage.addChild(this.fieldBorder);
         var fieldMask = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.Graphics();
         fieldMask.lineStyle(0);
         fieldMask.beginFill(0xffffff);
         fieldMask.drawCircle(_config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2 - 4);
         fieldMask.endFill();
         this.pixi.stage.mask = fieldMask;
-        app.pixi.ticker.add(function (delta) { return _this.loop(delta); });
+        this.pixi.ticker.add(function (delta) { return _this.loop(delta); });
         this.start();
     };
     /// draw loop
@@ -703,6 +705,7 @@ var App = /** @class */ (function () {
         // add a center particle
         if (this.field.num_static_particles == 0)
             this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(0., 0.));
+        this.simulationTimeStart = (new Date()).getTime();
         this.ready = true;
         this.resume();
     };
@@ -744,7 +747,11 @@ var App = /** @class */ (function () {
     };
     return App;
 }());
-var app = new App;
+var app;
+function createApp() {
+    app = new App();
+    return app;
+}
 
 
 
@@ -960,6 +967,7 @@ function regrowParticleContainer(spriteContainer, actualCount) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _app__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app */ "./app.ts");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./config */ "./config/index.ts");
 /*
    Copyright 2020 Alexander Efremkin
 
@@ -975,46 +983,73 @@ __webpack_require__.r(__webpack_exports__);
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-var _a, _b, _c, _d;
+;
 
-_app__WEBPACK_IMPORTED_MODULE_0__.app.load();
 // bind app to DOM
-(_a = document.getElementById("view")) === null || _a === void 0 ? void 0 : _a.appendChild(_app__WEBPACK_IMPORTED_MODULE_0__.app.pixi.view);
-(_b = document.getElementById("reset")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", function () {
-    _app__WEBPACK_IMPORTED_MODULE_0__.app.reset();
-    var pp = document.getElementById("play-pause");
-    if (pp) {
-        pp.innerHTML = 'Play';
+function bindApp() {
+    var _a, _b, _c, _d, _e;
+    if (screen.width < _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width || screen.height < _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height) {
+        var dim = Math.min(screen.width - 24, screen.height - 60);
+        console.log(dim);
+        _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width = dim;
+        _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height = dim;
     }
-});
-(_c = document.getElementById("play-pause")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", function () {
-    var pp = document.getElementById("play-pause");
-    if (!pp)
-        return;
-    if (_app__WEBPACK_IMPORTED_MODULE_0__.app.isReady() && _app__WEBPACK_IMPORTED_MODULE_0__.app.isPaused()) {
-        _app__WEBPACK_IMPORTED_MODULE_0__.app.resume();
-        pp.innerHTML = 'Pause';
-    }
-    else if (_app__WEBPACK_IMPORTED_MODULE_0__.app.isReady() && !_app__WEBPACK_IMPORTED_MODULE_0__.app.isPaused()) {
-        _app__WEBPACK_IMPORTED_MODULE_0__.app.pause();
-        pp.innerHTML = 'Play';
-    }
-    else if (!_app__WEBPACK_IMPORTED_MODULE_0__.app.isReady()) {
-        _app__WEBPACK_IMPORTED_MODULE_0__.app.start();
-        pp.innerHTML = 'Pause';
-    }
-});
-(_d = document.getElementById("view")) === null || _d === void 0 ? void 0 : _d.addEventListener("mousemove", function (ev) {
-    if (!_app__WEBPACK_IMPORTED_MODULE_0__.app.isReady() && (ev.buttons & 1)) {
-        // drawing mode: not running, mouse button pressed
-        _app__WEBPACK_IMPORTED_MODULE_0__.app.addCustomParticle(ev.offsetX, ev.offsetY);
-    }
-});
-window.setInterval(function () {
-    var elFps = document.getElementById('fps');
-    if (elFps)
-        elFps.innerHTML = _app__WEBPACK_IMPORTED_MODULE_0__.app.pixi.ticker.FPS.toFixed(0);
-}, 667);
+    var app = (0,_app__WEBPACK_IMPORTED_MODULE_0__.createApp)();
+    app.load();
+    (_a = document.getElementById("view")) === null || _a === void 0 ? void 0 : _a.appendChild(app.pixi.view);
+    (_b = document.getElementById("reset")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", function () {
+        app.reset();
+        var pp = document.getElementById("play-pause");
+        if (pp) {
+            pp.innerHTML = 'Play';
+        }
+    });
+    (_c = document.getElementById("play-pause")) === null || _c === void 0 ? void 0 : _c.addEventListener("click", function () {
+        var pp = document.getElementById("play-pause");
+        if (!pp)
+            return;
+        if (app.isReady() && app.isPaused()) {
+            app.resume();
+            pp.innerHTML = 'Pause';
+        }
+        else if (app.isReady() && !app.isPaused()) {
+            app.pause();
+            pp.innerHTML = 'Play';
+        }
+        else if (!app.isReady()) {
+            app.start();
+            pp.innerHTML = 'Pause';
+        }
+    });
+    (_d = document.getElementById("view")) === null || _d === void 0 ? void 0 : _d.addEventListener("mousemove", function (ev) {
+        if (!app.isReady() && (ev.buttons & 1)) {
+            // drawing mode: not running, mouse button pressed
+            app.addCustomParticle(ev.offsetX, ev.offsetY);
+        }
+    });
+    (_e = document.getElementById("view")) === null || _e === void 0 ? void 0 : _e.addEventListener("touchmove", function (ev) {
+        var _a;
+        var rc = (_a = document.getElementById("view")) === null || _a === void 0 ? void 0 : _a.getBoundingClientRect();
+        if (rc && !app.isReady()) {
+            // drawing mode: not running, touch active
+            for (var _i = 0, _b = Array.from(ev.touches); _i < _b.length; _i++) {
+                var touch = _b[_i];
+                var px = touch.clientX - rc.left;
+                var py = touch.clientY - rc.top;
+                app.addCustomParticle(px, py);
+            }
+        }
+    });
+    window.setInterval(function () {
+        var elFps = document.getElementById('fps');
+        if (elFps)
+            elFps.innerHTML = app.pixi.ticker.FPS.toFixed(0);
+    }, 667);
+}
+if (document.readyState !== 'loading')
+    bindApp();
+else
+    window.addEventListener('DOMContentLoaded', bindApp);
 
 
 /***/ })
