@@ -28,7 +28,8 @@ function addSprites(spriteContainer: PIXI.Container, numSprites: number) {
 }
 
 function updateVisibleParticles() {
-    regrowParticleContainer(app.movingParticlesContainer, app.field.num_moving_particles)
+    const num_moving_particles = app.field.moving_particles_count();
+    regrowParticleContainer(app.movingParticlesContainer, num_moving_particles)
     regrowParticleContainer(app.staticParticlesContainer, app.field.num_static_particles)
 
     // update moving particles positions
@@ -36,11 +37,11 @@ function updateVisibleParticles() {
     const movingParticlesView = new Float64Array(
         memory.buffer,
         app.field.moving_particles_ptr(),
-        app.field.num_moving_particles * particle_size);
+        num_moving_particles * particle_size);
     const now = app.pixi.ticker.lastTime;
     const alpha_offset = app.fieldBorder.alpha; // match border
 
-    for (let i = 0; i < app.field.num_moving_particles; i++) {
+    for (let i = 0; i < num_moving_particles; i++) {
         app.movingParticlesContainer.children[i].position.set(
             movingParticlesView[i * particle_size], movingParticlesView[i * particle_size + 1])
         // moving particles have a timestamp when they appeared; we use this timestamp

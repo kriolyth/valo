@@ -107,7 +107,7 @@ class App {
                 // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
                 this.field.update_velocities(0.8);
 
-                if (this.field.num_moving_particles + this.field.num_static_particles < config.field.maxParticles) {
+                if (this.field.moving_particles_count() + this.field.num_static_particles < config.field.maxParticles) {
                     // additional spawn rate from consumed particles
                     const addSpawnRate = this.field.num_static_particles / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
                     // probability of spawn event happening in the last frame
@@ -121,7 +121,7 @@ class App {
 
         // draw ui
         this.fieldBorder.alpha =
-            (config.field.maxParticles - this.field.num_static_particles - this.field.num_moving_particles) /
+            (config.field.maxParticles - this.field.num_static_particles - this.field.moving_particles_count()) /
             config.field.maxParticles;
 
     }
