@@ -107,9 +107,9 @@ class App {
                 // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
                 this.field.update_velocities(0.8);
 
-                if (this.field.num_moving_particles + this.field.num_static_particles < config.field.maxParticles) {
+                if (this.field.moving_particles_count() + this.field.static_particles_count() < config.field.maxParticles) {
                     // additional spawn rate from consumed particles
-                    const addSpawnRate = this.field.num_static_particles / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
+                    const addSpawnRate = this.field.static_particles_count() / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
                     // probability of spawn event happening in the last frame
                     const expInterval = Math.exp(-(addSpawnRate + config.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
                     if (Math.random() > expInterval) {
@@ -121,7 +121,7 @@ class App {
 
         // draw ui
         this.fieldBorder.alpha =
-            (config.field.maxParticles - this.field.num_static_particles - this.field.num_moving_particles) /
+            (config.field.maxParticles - this.field.static_particles_count() - this.field.moving_particles_count()) /
             config.field.maxParticles;
 
     }
@@ -141,7 +141,7 @@ class App {
         }
 
         // add a center particle
-        if (this.field.num_static_particles == 0)
+        if (this.field.static_particles_count() == 0)
             this.field.add_static_particle(new wasm.Vector(0., 0.))
 
         this.simulationTimeStart = (new Date()).getTime();

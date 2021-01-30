@@ -15,6 +15,7 @@
 */
 
 use wasm_bindgen::prelude::*;
+mod container;
 mod extfn;
 mod field;
 mod particle;
