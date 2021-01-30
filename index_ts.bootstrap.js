@@ -62,6 +62,8 @@ function _assertClass(instance, klass) {
     return instance.ptr;
 }
 
+function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
+
 let cachegetInt32Memory0 = null;
 function getInt32Memory0() {
     if (cachegetInt32Memory0 === null || cachegetInt32Memory0.buffer !== _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.memory.buffer) {
@@ -97,7 +99,6 @@ function get_random_in_range(min, max) {
     return ret;
 }
 
-function notDefined(what) { return () => { throw new Error(`${what} is not defined`); }; }
 /**
 * Renderable field
 * TODO:
@@ -123,32 +124,6 @@ class Field {
         _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_field_free(ptr);
     }
     /**
-    * @returns {number}
-    */
-    get num_moving_particles() {
-        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_get_field_num_moving_particles(this.ptr);
-        return ret >>> 0;
-    }
-    /**
-    * @param {number} arg0
-    */
-    set num_moving_particles(arg0) {
-        _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_field_num_moving_particles(this.ptr, arg0);
-    }
-    /**
-    * @returns {number}
-    */
-    get num_static_particles() {
-        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_get_field_num_static_particles(this.ptr);
-        return ret >>> 0;
-    }
-    /**
-    * @param {number} arg0
-    */
-    set num_static_particles(arg0) {
-        _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_field_num_static_particles(this.ptr, arg0);
-    }
-    /**
     * @param {number} half_width
     * @param {number} half_height
     */
@@ -169,6 +144,20 @@ class Field {
     static_particles_ptr() {
         var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.field_static_particles_ptr(this.ptr);
         return ret;
+    }
+    /**
+    * @returns {number}
+    */
+    moving_particles_count() {
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.field_moving_particles_count(this.ptr);
+        return ret >>> 0;
+    }
+    /**
+    * @returns {number}
+    */
+    static_particles_count() {
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.field_static_particles_count(this.ptr);
+        return ret >>> 0;
     }
     /**
     * add a particle anywhere in the field
@@ -508,8 +497,6 @@ const __wbindgen_throw = function(arg0, arg1) {
   \***************************/
 /*! namespace exports */
 /*! export __wbg_field_free [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_field_num_moving_particles [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_field_num_static_particles [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_get_movingparticle_flags [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_get_movingparticle_pos [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_get_movingparticle_since [provided] [no usage info] [provision prevents renaming (no use info)] */
@@ -520,8 +507,6 @@ const __wbindgen_throw = function(arg0, arg1) {
 /*! export __wbg_get_vector_x [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_get_vector_y [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_movingparticle_free [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_field_num_moving_particles [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_field_num_static_particles [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_set_movingparticle_flags [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_set_movingparticle_pos [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export __wbg_set_movingparticle_since [provided] [no usage info] [provision prevents renaming (no use info)] */
@@ -538,8 +523,10 @@ const __wbindgen_throw = function(arg0, arg1) {
 /*! export field_add_boundary_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_add_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_add_static_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export field_moving_particles_count [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_moving_particles_ptr [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_new [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export field_static_particles_count [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_static_particles_ptr [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_update_attachments [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export field_update_positions [provided] [no usage info] [provision prevents renaming (no use info)] */
@@ -675,9 +662,9 @@ var App = /** @class */ (function () {
                 this.field.update_positions(0.75);
                 // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
                 this.field.update_velocities(0.8);
-                if (this.field.num_moving_particles + this.field.num_static_particles < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles) {
+                if (this.field.moving_particles_count() + this.field.static_particles_count() < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles) {
                     // additional spawn rate from consumed particles
-                    var addSpawnRate = this.field.num_static_particles / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
+                    var addSpawnRate = this.field.static_particles_count() / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
                     // probability of spawn event happening in the last frame
                     var expInterval = Math.exp(-(addSpawnRate + _config__WEBPACK_IMPORTED_MODULE_1__.default.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
                     if (Math.random() > expInterval) {
@@ -688,7 +675,7 @@ var App = /** @class */ (function () {
         }
         // draw ui
         this.fieldBorder.alpha =
-            (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles - this.field.num_static_particles - this.field.num_moving_particles) /
+            (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles - this.field.static_particles_count() - this.field.moving_particles_count()) /
                 _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles;
     };
     /// Reset the simulation
@@ -703,7 +690,7 @@ var App = /** @class */ (function () {
             this.field.add_particle();
         }
         // add a center particle
-        if (this.field.num_static_particles == 0)
+        if (this.field.static_particles_count() == 0)
             this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(0., 0.));
         this.simulationTimeStart = (new Date()).getTime();
         this.ready = true;
@@ -920,14 +907,16 @@ function addSprites(spriteContainer, numSprites) {
     }
 }
 function updateVisibleParticles() {
-    regrowParticleContainer(_app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.num_moving_particles);
-    regrowParticleContainer(_app__WEBPACK_IMPORTED_MODULE_1__.app.staticParticlesContainer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.num_static_particles);
+    var num_moving_particles = _app__WEBPACK_IMPORTED_MODULE_1__.app.field.moving_particles_count();
+    var num_static_particles = _app__WEBPACK_IMPORTED_MODULE_1__.app.field.static_particles_count();
+    regrowParticleContainer(_app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer, num_moving_particles);
+    regrowParticleContainer(_app__WEBPACK_IMPORTED_MODULE_1__.app.staticParticlesContainer, num_static_particles);
     // update moving particles positions
     var particle_size = _pkg_valo__WEBPACK_IMPORTED_MODULE_2__.MovingParticle.get_f64_size();
-    var movingParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.moving_particles_ptr(), _app__WEBPACK_IMPORTED_MODULE_1__.app.field.num_moving_particles * particle_size);
+    var movingParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.moving_particles_ptr(), num_moving_particles * particle_size);
     var now = _app__WEBPACK_IMPORTED_MODULE_1__.app.pixi.ticker.lastTime;
     var alpha_offset = _app__WEBPACK_IMPORTED_MODULE_1__.app.fieldBorder.alpha; // match border
-    for (var i = 0; i < _app__WEBPACK_IMPORTED_MODULE_1__.app.field.num_moving_particles; i++) {
+    for (var i = 0; i < num_moving_particles; i++) {
         _app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer.children[i].position.set(movingParticlesView[i * particle_size], movingParticlesView[i * particle_size + 1]);
         // moving particles have a timestamp when they appeared; we use this timestamp
         // to have particles gradually achieve full glow, 
@@ -935,8 +924,8 @@ function updateVisibleParticles() {
         _app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer.children[i].alpha = Math.min(1.0, alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3000));
     }
     // update static particles positions
-    var staticParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.static_particles_ptr(), _app__WEBPACK_IMPORTED_MODULE_1__.app.field.num_static_particles * 4);
-    for (var i = 0; i < _app__WEBPACK_IMPORTED_MODULE_1__.app.field.num_static_particles; i++) {
+    var staticParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.static_particles_ptr(), num_static_particles * 4);
+    for (var i = 0; i < num_static_particles; i++) {
         _app__WEBPACK_IMPORTED_MODULE_1__.app.staticParticlesContainer.children[i].position.set(staticParticlesView[i * 4], staticParticlesView[i * 4 + 1]);
     }
 }
