@@ -29,8 +29,9 @@ function addSprites(spriteContainer: PIXI.Container, numSprites: number) {
 
 function updateVisibleParticles() {
     const num_moving_particles = app.field.moving_particles_count();
+    const num_static_particles = app.field.static_particles_count();
     regrowParticleContainer(app.movingParticlesContainer, num_moving_particles)
-    regrowParticleContainer(app.staticParticlesContainer, app.field.num_static_particles)
+    regrowParticleContainer(app.staticParticlesContainer, num_static_particles)
 
     // update moving particles positions
     const particle_size = MovingParticle.get_f64_size();
@@ -56,8 +57,8 @@ function updateVisibleParticles() {
     const staticParticlesView = new Float64Array(
         memory.buffer,
         app.field.static_particles_ptr(),
-        app.field.num_static_particles * 4);
-    for (let i = 0; i < app.field.num_static_particles; i++) {
+        num_static_particles * 4);
+    for (let i = 0; i < num_static_particles; i++) {
         app.staticParticlesContainer.children[i].position.set(
             staticParticlesView[i * 4], staticParticlesView[i * 4 + 1])
     }

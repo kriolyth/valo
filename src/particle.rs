@@ -201,7 +201,9 @@ impl BindingResult {
         mp_bind_cfg: &BindingConfiguration,
         sp_bind_cfg: &BindingConfiguration,
     ) -> Option<BindingResult> {
-        if !sp_bind_cfg.close_enough_to_bind(&mp.pos, &sp.pos) || sp.count_busy_ports() >= sp_bind_cfg.max_binds {
+        if !sp_bind_cfg.close_enough_to_bind(&mp.pos, &sp.pos)
+            || sp.count_busy_ports() >= sp_bind_cfg.max_binds
+        {
             return None;
         }
         let diff_to_mp = Vector::diff(&mp.pos, &sp.pos);

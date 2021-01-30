@@ -15,11 +15,11 @@
 */
 
 use wasm_bindgen::prelude::*;
+mod container;
 mod extfn;
 mod field;
 mod particle;
 mod vector;
-mod container;
 
 #[cfg(not(test))]
 #[wasm_bindgen(start)]
