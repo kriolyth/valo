@@ -371,6 +371,13 @@ class StaticParticle {
         const high0 = u32CvtShim[1];
         _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.__wbg_set_staticparticle_binding_cfg_id(this.ptr, low0, high0);
     }
+    /**
+    * @returns {number}
+    */
+    static get_f64_size() {
+        var ret = _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__.get_random();
+        return ret >>> 0;
+    }
 }
 /**
 * Vector
@@ -536,6 +543,7 @@ const __wbindgen_throw = function(arg0, arg1) {
 /*! export main [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export memory [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export movingparticle_get_f64_size [provided] [no usage info] [provision prevents renaming (no use info)] */
+/*! export staticparticle_get_f64_size [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export vector_diff [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export vector_distance_squared [provided] [no usage info] [provision prevents renaming (no use info)] */
 /*! export vector_dot [provided] [no usage info] [provision prevents renaming (no use info)] */
@@ -924,9 +932,10 @@ function updateVisibleParticles() {
         _app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer.children[i].alpha = Math.min(1.0, alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3000));
     }
     // update static particles positions
-    var staticParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.static_particles_ptr(), num_static_particles * 4);
+    var static_particle_size = _pkg_valo__WEBPACK_IMPORTED_MODULE_2__.StaticParticle.get_f64_size();
+    var staticParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.static_particles_ptr(), num_static_particles * static_particle_size);
     for (var i = 0; i < num_static_particles; i++) {
-        _app__WEBPACK_IMPORTED_MODULE_1__.app.staticParticlesContainer.children[i].position.set(staticParticlesView[i * 4], staticParticlesView[i * 4 + 1]);
+        _app__WEBPACK_IMPORTED_MODULE_1__.app.staticParticlesContainer.children[i].position.set(staticParticlesView[i * static_particle_size], staticParticlesView[i * static_particle_size + 1]);
     }
 }
 function regrowParticleContainer(spriteContainer, actualCount) {
