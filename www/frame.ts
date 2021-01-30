@@ -14,7 +14,7 @@
    limitations under the License.
 */
 
-import { MovingParticle } from '../pkg/valo';
+import { MovingParticle, StaticParticle } from '../pkg/valo';
 import { memory } from '../pkg/valo_bg.wasm';
 import * as PIXI from 'pixi.js';
 
@@ -49,18 +49,19 @@ function updateVisibleParticles() {
         // to have particles gradually achieve full glow, 
         // and offset initial glow to match border 
         app.movingParticlesContainer.children[i].alpha = Math.min(
-            1.0, 
+            1.0,
             alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3000));
     }
 
     // update static particles positions
+    const static_particle_size = StaticParticle.get_f64_size();
     const staticParticlesView = new Float64Array(
         memory.buffer,
         app.field.static_particles_ptr(),
-        num_static_particles * 4);
+        num_static_particles * static_particle_size);
     for (let i = 0; i < num_static_particles; i++) {
         app.staticParticlesContainer.children[i].position.set(
-            staticParticlesView[i * 4], staticParticlesView[i * 4 + 1])
+            staticParticlesView[i * static_particle_size], staticParticlesView[i * static_particle_size + 1])
     }
 }
 

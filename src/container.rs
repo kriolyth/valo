@@ -14,8 +14,7 @@
    limitations under the License.
 */
 
-use crate::particle::MovingParticle;
-use crate::particle::StaticParticle;
+use crate::particle::{MovingParticle, StaticParticle};
 use std::slice;
 
 /// Reference to a particle of a certain type
