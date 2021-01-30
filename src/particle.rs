@@ -70,6 +70,12 @@ impl Default for StaticParticle {
         }
     }
 }
+#[wasm_bindgen]
+impl StaticParticle {
+    pub fn get_f64_size() -> usize {
+        4
+    }
+}
 impl StaticParticle {
     fn bind_config_and_port(cfg_id: u64, port: u8) -> u64 {
         (cfg_id & BIND_CFG_ID_MASK) | (1u64 << (32 + port))

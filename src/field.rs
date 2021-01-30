@@ -14,12 +14,11 @@
    limitations under the License.
 */
 
-use crate::container::Particle;
-use crate::container::StaticParticleContainer;
-use crate::extfn;
 use wasm_bindgen::prelude::*;
 
-use crate::container::MovingParticleContainer;
+use crate::extfn;
+
+use crate::container::{Particle, MovingParticleContainer, StaticParticleContainer};
 use crate::particle::{BindingConfiguration, BindingResult, MovingParticle, StaticParticle};
 use crate::vector::*;
 
