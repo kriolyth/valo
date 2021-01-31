@@ -664,6 +664,7 @@ var App = /** @class */ (function () {
     };
     /// draw loop
     App.prototype.loop = function (delta) {
+        var _this = this;
         // delta = 1 for 60 FPS and scales depending on frame rate (0.5 for 120 FPS)
         this.lastFrameTime = delta;
         (0,_frame__WEBPACK_IMPORTED_MODULE_2__.updateVisibleParticles)();
@@ -700,12 +701,18 @@ var App = /** @class */ (function () {
                         this.field.add_boundary_particle(this.simulationTime);
                     }
                 }
+                else if (this.field.moving_particles_count() == 0) {
+                    // end simulation
+                    this.pixi.ticker.addOnce(function () { return _this.ready = false; });
+                }
             }
         }
         // draw ui
         this.fieldBorder.alpha =
             (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles - this.field.static_particles_count() - this.field.moving_particles_count()) /
                 _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles;
+        if (!this.ready)
+            this.stopRender();
     };
     /// Reset the simulation
     App.prototype.reset = function () {
@@ -724,6 +731,7 @@ var App = /** @class */ (function () {
             this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(0., 0.));
         this.simulationTime = 0;
         this.ready = true;
+        this.startRender();
         this.resume();
     };
     /// Pause a currently active simulation
@@ -739,6 +747,12 @@ var App = /** @class */ (function () {
     };
     App.prototype.isReady = function () {
         return this.ready;
+    };
+    App.prototype.startRender = function () {
+        this.pixi.start();
+    };
+    App.prototype.stopRender = function () {
+        this.pixi.stop();
     };
     App.prototype.addCustomParticle = function (viewX, viewY) {
         var px = ((viewX / _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width) - 0.5) * 2;
@@ -1017,6 +1031,7 @@ function bindApp() {
     (_a = document.getElementById("view")) === null || _a === void 0 ? void 0 : _a.appendChild(app.pixi.view);
     (_b = document.getElementById("reset")) === null || _b === void 0 ? void 0 : _b.addEventListener("click", function () {
         app.reset();
+        app.startRender();
         var pp = document.getElementById("play-pause");
         if (pp) {
             pp.innerHTML = 'Play';
@@ -1043,6 +1058,7 @@ function bindApp() {
         if (!app.isReady() && (ev.buttons & 1)) {
             // drawing mode: not running, mouse button pressed
             app.addCustomParticle(ev.offsetX, ev.offsetY);
+            app.startRender();
         }
     });
     (_e = document.getElementById("view")) === null || _e === void 0 ? void 0 : _e.addEventListener("touchmove", function (ev) {
@@ -1055,6 +1071,7 @@ function bindApp() {
                 var px = touch.clientX - rc.left;
                 var py = touch.clientY - rc.top;
                 app.addCustomParticle(px, py);
+                app.startRender();
             }
         }
     });
