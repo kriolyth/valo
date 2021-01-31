@@ -625,9 +625,11 @@ var App = /** @class */ (function () {
         this.staticParticlesContainer = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.ParticleContainer(2000, { position: true, tint: true });
         this.fieldBorder = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.Graphics();
         this.pixi.ticker.maxFPS = _config__WEBPACK_IMPORTED_MODULE_1__.default.display.maxfps;
-        this.simulationTimeStart = (new Date()).getTime();
         this.ready = false;
         this.paused = false;
+        this.lastFrameTime = 0;
+        this.simulationTime = 0;
+        this.initialStaticParticlesCount = 0;
     }
     /// load resources
     App.prototype.load = function () {
@@ -662,21 +664,40 @@ var App = /** @class */ (function () {
     };
     /// draw loop
     App.prototype.loop = function (delta) {
+        // delta = 1 for 60 FPS and scales depending on frame rate (0.5 for 120 FPS)
+        this.lastFrameTime = delta;
         (0,_frame__WEBPACK_IMPORTED_MODULE_2__.updateVisibleParticles)();
+        // Moving particles have velocities; this is how fast their positions changes in velocity direction
+        var positionFactor = 0.75;
+        // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
+        var velocityFactor = 0.8;
         if (this.ready && !this.paused) {
+            this.simulationTime += delta / 60.;
             for (var tick = 0; tick < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.ticksPerCall; tick++) {
                 this.field.update_attachments();
-                // Moving particles have velocities; this is how fast their positions changes in velocity direction
-                this.field.update_positions(0.75);
-                // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
-                this.field.update_velocities(0.8);
+                if (delta < 0.7) {
+                    // take smaller steps for high FPS
+                    this.field.update_positions(positionFactor * delta);
+                    // velocity update can be stochastic at high frame rates
+                    var expInterval = Math.exp(-delta);
+                    if (Math.random() > expInterval) {
+                        this.field.update_velocities(velocityFactor);
+                    }
+                }
+                else {
+                    // take a few steps (but at most 3) when framerate is too low
+                    for (var i = 0; i < Math.min(3, Math.round(delta)); i++) {
+                        this.field.update_positions(positionFactor);
+                        this.field.update_velocities(velocityFactor);
+                    }
+                }
                 if (this.field.moving_particles_count() + this.field.static_particles_count() < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles) {
                     // additional spawn rate from consumed particles
-                    var addSpawnRate = this.field.static_particles_count() / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
+                    var addSpawnRate = (this.field.static_particles_count() - this.initialStaticParticlesCount) / this.simulationTime;
                     // probability of spawn event happening in the last frame
                     var expInterval = Math.exp(-(addSpawnRate + _config__WEBPACK_IMPORTED_MODULE_1__.default.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
                     if (Math.random() > expInterval) {
-                        this.field.add_boundary_particle(this.pixi.ticker.lastTime);
+                        this.field.add_boundary_particle(this.simulationTime);
                     }
                 }
             }
@@ -697,22 +718,21 @@ var App = /** @class */ (function () {
         for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.startParticles; i++) {
             this.field.add_particle();
         }
+        this.initialStaticParticlesCount = this.field.static_particles_count();
         // add a center particle
-        if (this.field.static_particles_count() == 0)
+        if (this.initialStaticParticlesCount == 0)
             this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(0., 0.));
-        this.simulationTimeStart = (new Date()).getTime();
+        this.simulationTime = 0;
         this.ready = true;
         this.resume();
     };
     /// Pause a currently active simulation
     App.prototype.pause = function () {
-        // this.pixi.stop()
         this.paused = true;
     };
     /// Resume a currently active simulation
     App.prototype.resume = function () {
         this.paused = false;
-        // this.pixi.start()
     };
     App.prototype.isPaused = function () {
         return this.paused;
@@ -795,7 +815,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
     width: 512,
     height: 512,
-    maxfps: 60 // limit fps
+    maxfps: 0 // limit fps
 });
 
 
@@ -922,14 +942,14 @@ function updateVisibleParticles() {
     // update moving particles positions
     var particle_size = _pkg_valo__WEBPACK_IMPORTED_MODULE_2__.MovingParticle.get_f64_size();
     var movingParticlesView = new Float64Array(_pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__.memory.buffer, _app__WEBPACK_IMPORTED_MODULE_1__.app.field.moving_particles_ptr(), num_moving_particles * particle_size);
-    var now = _app__WEBPACK_IMPORTED_MODULE_1__.app.pixi.ticker.lastTime;
+    var now = _app__WEBPACK_IMPORTED_MODULE_1__.app.simulationTime;
     var alpha_offset = _app__WEBPACK_IMPORTED_MODULE_1__.app.fieldBorder.alpha; // match border
     for (var i = 0; i < num_moving_particles; i++) {
         _app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer.children[i].position.set(movingParticlesView[i * particle_size], movingParticlesView[i * particle_size + 1]);
         // moving particles have a timestamp when they appeared; we use this timestamp
         // to have particles gradually achieve full glow, 
         // and offset initial glow to match border 
-        _app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer.children[i].alpha = Math.min(1.0, alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3000));
+        _app__WEBPACK_IMPORTED_MODULE_1__.app.movingParticlesContainer.children[i].alpha = Math.min(1.0, alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3));
     }
     // update static particles positions
     var static_particle_size = _pkg_valo__WEBPACK_IMPORTED_MODULE_2__.StaticParticle.get_f64_size();
@@ -1041,7 +1061,7 @@ function bindApp() {
     window.setInterval(function () {
         var elFps = document.getElementById('fps');
         if (elFps)
-            elFps.innerHTML = app.pixi.ticker.FPS.toFixed(0);
+            elFps.innerHTML = app.lastFrameTime.toFixed(3);
     }, 667);
 }
 if (document.readyState !== 'loading')
