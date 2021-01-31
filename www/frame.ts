@@ -39,7 +39,7 @@ function updateVisibleParticles() {
         memory.buffer,
         app.field.moving_particles_ptr(),
         num_moving_particles * particle_size);
-    const now = app.pixi.ticker.lastTime;
+    const now = app.simulationTime;
     const alpha_offset = app.fieldBorder.alpha; // match border
 
     for (let i = 0; i < num_moving_particles; i++) {
@@ -50,7 +50,7 @@ function updateVisibleParticles() {
         // and offset initial glow to match border 
         app.movingParticlesContainer.children[i].alpha = Math.min(
             1.0,
-            alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3000));
+            alpha_offset + (now - movingParticlesView[i * particle_size + 4]) / (3));
     }
 
     // update static particles positions
