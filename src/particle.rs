@@ -162,6 +162,9 @@ impl BindingConfiguration {
     pub fn set_radius(&mut self, radius: f64) {
         self.radius = radius;
     }
+    pub fn radius(&self) -> f64 {
+        self.radius
+    }
 
     fn angle_to_port(&self, angle: f64) -> Option<usize> {
         let mut start = 0f64;

@@ -14,6 +14,7 @@
    limitations under the License.
 */
 
+use crate::vector::Vector;
 use crate::particle::{MovingParticle, StaticParticle};
 use std::slice;
 
@@ -160,5 +161,17 @@ where
         if particle.index < self.particles.len() {
             self.particles[particle.index] = particle.particle
         }
+    }
+}
+
+impl StaticParticleContainer {
+    pub fn select_for_binding(&self, target: &Vector, range: f64) ->  Vec<ParticleRef<StaticParticle>> {
+        // let result = Vec::<ParticleRef<StaticParticle>>::with_capacity(16);
+        self.values()
+            .filter(|ref_particle| {
+                (ref_particle.particle.pos.x - target.x).abs() <= range 
+                && (ref_particle.particle.pos.y - target.y).abs() <= range 
+            })
+            .collect()
     }
 }

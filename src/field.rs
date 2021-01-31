@@ -265,7 +265,7 @@ impl Field {
         let bind_cfg = &self.bind_cfgs[0];
 
         'outer: for moving in self.mp_container.values() {
-            'inner: for fixed in self.sp_container.values() {
+            'inner: for fixed in self.sp_container.select_for_binding(&moving.particle.pos, bind_cfg.radius()) {
                 if let Some(binding) =
                     BindingResult::get_binding(moving.particle, fixed.particle, bind_cfg, bind_cfg)
                 {
@@ -287,7 +287,8 @@ impl Field {
 
         let closest_static_particles: Vec<_> = self
             .sp_container
-            .values()
+            .select_for_binding(&moving.pos, bind_cfg.radius())
+            .into_iter()
             .filter(|fixed| bind_cfg.close_enough_to_bind(&fixed.particle.pos, &moving.pos))
             .collect();
         if closest_static_particles.is_empty() {
