@@ -75,7 +75,7 @@ function bindApp() {
     window.setInterval(() => {
         const elFps = document.getElementById('fps');
         if (elFps)
-            elFps.innerHTML = app.pixi.ticker.FPS.toFixed(0);
+            elFps.innerHTML = app.lastFrameTime.toFixed(3);
     }, 667);
 }
 

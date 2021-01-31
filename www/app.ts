@@ -26,10 +26,16 @@ class App {
     movingParticlesContainer: PIXI.ParticleContainer;
     staticParticlesContainer: PIXI.ParticleContainer;
     fieldBorder: PIXI.Graphics;
-    simulationTimeStart: number;
+
+    // initial static particles count when simulation started;
+    // need to know this because it affects spawn rate of moving particles
+    initialStaticParticlesCount: number;
 
     paused: boolean;
     ready: boolean;
+
+    lastFrameTime: number;
+    simulationTime: number;
 
     constructor() {
         this.field = new wasm.Field(config.field.width, config.field.height);
@@ -44,9 +50,12 @@ class App {
         this.fieldBorder = new PIXI.Graphics();
         this.pixi.ticker.maxFPS = config.display.maxfps;
 
-        this.simulationTimeStart = (new Date()).getTime();
         this.ready = false;
         this.paused = false;
+
+        this.lastFrameTime = 0;
+        this.simulationTime = 0;
+        this.initialStaticParticlesCount = 0;
     }
 
     /// load resources
@@ -94,26 +103,45 @@ class App {
 
     /// draw loop
     loop(delta: number) {
+        // delta = 1 for 60 FPS and scales depending on frame rate (0.5 for 120 FPS)
+        this.lastFrameTime = delta;
 
         updateVisibleParticles();
+
+        // Moving particles have velocities; this is how fast their positions changes in velocity direction
+        const positionFactor = 0.75;
+        // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
+        const velocityFactor = 0.8;
         
         if (this.ready && !this.paused) {
+            this.simulationTime += delta / 60.;
             for (let tick = 0; tick < config.field.ticksPerCall; tick++) {
                 this.field.update_attachments();
 
-                // Moving particles have velocities; this is how fast their positions changes in velocity direction
-                this.field.update_positions(0.75);
-
-                // Velocities are also updated every time; this value is how fast velocity changes due to environment effects
-                this.field.update_velocities(0.8);
+                if (delta < 0.7) {
+                    // take smaller steps for high FPS
+                    this.field.update_positions(positionFactor * delta);
+                    
+                    // velocity update can be stochastic at high frame rates
+                    const expInterval = Math.exp(-delta);
+                    if (Math.random() > expInterval) {
+                        this.field.update_velocities(velocityFactor);
+                    }
+                } else {
+                    // take a few steps (but at most 3) when framerate is too low
+                    for (let i = 0; i < Math.min(3, Math.round(delta)); i++) {
+                        this.field.update_positions(positionFactor);
+                        this.field.update_velocities(velocityFactor);
+                    }
+                }
 
                 if (this.field.moving_particles_count() + this.field.static_particles_count() < config.field.maxParticles) {
                     // additional spawn rate from consumed particles
-                    const addSpawnRate = this.field.static_particles_count() / (((new Date()).getTime() - this.simulationTimeStart) / 1000);
+                    const addSpawnRate = (this.field.static_particles_count() - this.initialStaticParticlesCount) / this.simulationTime;
                     // probability of spawn event happening in the last frame
                     const expInterval = Math.exp(-(addSpawnRate + config.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
                     if (Math.random() > expInterval) {
-                        this.field.add_boundary_particle(this.pixi.ticker.lastTime);
+                        this.field.add_boundary_particle(this.simulationTime);
                     }
                 }
             }
@@ -140,24 +168,24 @@ class App {
             this.field.add_particle()
         }
 
-        // add a center particle
-        if (this.field.static_particles_count() == 0)
-            this.field.add_static_particle(new wasm.Vector(0., 0.))
+        this.initialStaticParticlesCount = this.field.static_particles_count()
 
-        this.simulationTimeStart = (new Date()).getTime();
+        // add a center particle
+        if (this.initialStaticParticlesCount == 0)
+            this.field.add_static_particle(new wasm.Vector(0., 0.))
+        
+        this.simulationTime = 0;
         this.ready = true;
         this.resume();
     }
 
     /// Pause a currently active simulation
     pause() {
-        // this.pixi.stop()
         this.paused = true
     }
     /// Resume a currently active simulation
     resume() {
         this.paused = false
-        // this.pixi.start()
     }
     isPaused() {
         return this.paused
