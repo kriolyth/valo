@@ -14,8 +14,8 @@
    limitations under the License.
 */
 
-import { createApp } from './app';
-import config from './config';
+import { createApp } from './app'
+import config from './config'
 
 // bind app to DOM
 function bindApp() {
@@ -26,30 +26,31 @@ function bindApp() {
         config.display.height = dim
     }
     const app = createApp()
-    app.load();
+    app.load()
 
-    document.getElementById("view")?.appendChild(app.pixi.view);
+    document.getElementById("view")?.appendChild(app.pixi.view)
 
     document.getElementById("reset")?.addEventListener("click", () => {
         app.reset()
-        let pp = document.getElementById("play-pause");
+        app.startRender()
+        const pp = document.getElementById("play-pause")
         if (pp) {
             pp.innerHTML = 'Play'
         }
     })
     document.getElementById("play-pause")?.addEventListener("click", () => {
-        let pp = document.getElementById("play-pause");
+        const pp = document.getElementById("play-pause");
         if (!pp)
             return;
         if (app.isReady() && app.isPaused()) {
-            app.resume();
+            app.resume()
             pp.innerHTML = 'Pause'
         }
         else if (app.isReady() && !app.isPaused()) {
-            app.pause();
+            app.pause()
             pp.innerHTML = 'Play'
         } else if (!app.isReady()) {
-            app.start();
+            app.start()
             pp.innerHTML = 'Pause'
         }
     })
@@ -57,6 +58,7 @@ function bindApp() {
         if (!app.isReady() && (ev.buttons & 1)) {
             // drawing mode: not running, mouse button pressed
             app.addCustomParticle(ev.offsetX, ev.offsetY)
+            app.startRender()
         }
     })
     document.getElementById("view")?.addEventListener("touchmove", (ev: TouchEvent) => {
@@ -67,6 +69,7 @@ function bindApp() {
                 const px = touch.clientX - rc.left
                 const py = touch.clientY - rc.top
                 app.addCustomParticle(px, py)
+                app.startRender()
             }
         }
     })
