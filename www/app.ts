@@ -143,6 +143,9 @@ class App {
                     if (Math.random() > expInterval) {
                         this.field.add_boundary_particle(this.simulationTime);
                     }
+                } else if (this.field.moving_particles_count() == 0) {
+                    // end simulation
+                    this.pixi.ticker.addOnce(() => this.ready = false)
                 }
             }
         }
@@ -152,6 +155,8 @@ class App {
             (config.field.maxParticles - this.field.static_particles_count() - this.field.moving_particles_count()) /
             config.field.maxParticles;
 
+        if (!this.ready)
+            this.stopRender()
     }
 
     /// Reset the simulation
@@ -174,9 +179,10 @@ class App {
         if (this.initialStaticParticlesCount == 0)
             this.field.add_static_particle(new wasm.Vector(0., 0.))
         
-        this.simulationTime = 0;
-        this.ready = true;
-        this.resume();
+        this.simulationTime = 0
+        this.ready = true
+        this.startRender()
+        this.resume()
     }
 
     /// Pause a currently active simulation
@@ -192,6 +198,12 @@ class App {
     }
     isReady() {
         return this.ready
+    }
+    startRender() {
+        this.pixi.start()
+    }
+    stopRender() {
+        this.pixi.stop()
     }
 
     addCustomParticle(viewX: number, viewY: number) {
