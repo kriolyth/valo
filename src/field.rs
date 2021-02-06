@@ -18,7 +18,7 @@ use wasm_bindgen::prelude::*;
 
 use crate::extfn;
 
-use crate::container::{Particle, MovingParticleContainer, StaticParticleContainer};
+use crate::container::{MovingParticleContainer, Particle, StaticParticleContainer};
 use crate::particle::{BindingConfiguration, BindingResult, MovingParticle, StaticParticle};
 use crate::vector::*;
 
@@ -99,14 +99,12 @@ impl Field {
 
     #[wasm_bindgen(constructor)]
     pub fn new(half_width: f64, half_height: f64) -> Field {
+        let dimensions = Vector::new(half_width, half_height);
         Field {
-            mp_container: MovingParticleContainer::new(MAX_MOVING),
-            sp_container: StaticParticleContainer::new(MAX_STATIC),
+            mp_container: MovingParticleContainer::new(MAX_MOVING, &dimensions),
+            sp_container: StaticParticleContainer::new(MAX_STATIC, &dimensions),
             bind_cfgs: [BindingConfiguration::make_hexa()],
-            dimensions: Vector {
-                x: half_width,
-                y: half_height,
-            },
+            dimensions,
         }
     }
 
@@ -265,7 +263,10 @@ impl Field {
         let bind_cfg = &self.bind_cfgs[0];
 
         'outer: for moving in self.mp_container.values() {
-            'inner: for fixed in self.sp_container.select_for_binding(&moving.particle.pos, bind_cfg.radius()) {
+            'inner: for fixed in self.sp_container.select_for_binding(
+                &moving.particle.pos,
+                bind_cfg.radius()
+            ) {
                 if let Some(binding) =
                     BindingResult::get_binding(moving.particle, fixed.particle, bind_cfg, bind_cfg)
                 {
@@ -351,7 +352,7 @@ mod tests {
 
     #[wasm_bindgen_test]
     fn attachment() {
-        let mut f = Field::new(10., 10.);
+        let mut f = Field::new(200., 200.);
         f.bind_cfgs[0] = BindingConfiguration::make_square();
         assert!(f.add_static_particle(Vector::new(0., 0.)));
 
@@ -394,7 +395,7 @@ mod tests {
 
     #[wasm_bindgen_test]
     fn attachment_multi() {
-        let mut f = Field::new(10., 10.);
+        let mut f = Field::new(200., 200.);
         f.bind_cfgs[0] = BindingConfiguration::make_square();
         assert!(f.add_static_particle(Vector::new(0., 0.)));
 
@@ -425,8 +426,8 @@ mod tests {
         });
 
         let att = f.check_mp_attachment();
-        assert_eq!(att[0].0.index, 1);
         assert_eq!(att.len(), 1);
+        assert_eq!(att[0].0.index, 1);
 
         f.update_attachments();
 
@@ -436,7 +437,7 @@ mod tests {
 
     #[wasm_bindgen_test]
     fn custom_initial_static() {
-        let mut f = Field::new(10., 10.);
+        let mut f = Field::new(512., 512.);
         f.bind_cfgs[0] = BindingConfiguration::make_square();
         f.bind_cfgs[0].set_max_binds(2);
         f.bind_cfgs[0].set_radius(std::f64::consts::SQRT_2);
@@ -454,7 +455,7 @@ mod tests {
         // which leaves a way to add new particles even when there is seemingly no place for them.
         // So here for the particle to be rejected here we rely on ports busy, rather than binds
         assert!(
-            !f.add_static_particle(Vector::new(0.1, 0.1)),
+            !f.add_static_particle(Vector::new(-0.1, 0.1)),
             "{:?} {:?} {:?} {:?}",
             f.sp_container.at(0),
             f.sp_container.at(1),
