@@ -22,6 +22,10 @@ use wasm_bindgen::prelude::*;
 // valid ID configuration bits
 const BIND_CFG_ID_MASK: u64 = 0xff;
 
+pub trait Positionable {
+    fn position(&self) -> Vector;
+}
+
 /// A moving particle on the field
 #[wasm_bindgen]
 #[derive(Copy, Clone, PartialEq)]
@@ -47,6 +51,10 @@ impl MovingParticle {
     pub fn get_f64_size() -> usize {
         6
     }
+}
+
+impl Positionable for MovingParticle {
+    fn position(&self) -> Vector { self.pos }
 }
 
 /// A static particle on the field
@@ -75,6 +83,9 @@ impl StaticParticle {
     pub fn get_f64_size() -> usize {
         4
     }
+}
+impl Positionable for StaticParticle {
+    fn position(&self) -> Vector { self.pos }
 }
 impl StaticParticle {
     fn bind_config_and_port(cfg_id: u64, port: u8) -> u64 {
