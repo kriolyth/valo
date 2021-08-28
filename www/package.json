@@ -24,11 +24,12 @@
     "valo": "file:../pkg"
   },
   "devDependencies": {
+    "@webpack-cli/serve": "^1.5.2",
     "copy-webpack-plugin": "^6.3.0",
     "ts-loader": "^8.0.11",
     "typescript": "^4.0.5",
     "webpack": "^5.4.0",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5"
+    "webpack-cli": "^4.8.0",
+    "webpack-dev-server": "^4.0.0"
   }
 }
