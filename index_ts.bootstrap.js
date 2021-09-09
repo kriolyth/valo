@@ -1,41 +1,28 @@
+"use strict";
 (self["webpackChunkvalo_html"] = self["webpackChunkvalo_html"] || []).push([["index_ts"],{
 
 /***/ "../pkg/valo_bg.js":
 /*!*************************!*\
   !*** ../pkg/valo_bg.js ***!
   \*************************/
-/*! namespace exports */
-/*! export Field [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export MovingParticle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export StaticParticle [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export Vector [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export __wbg_atan2_133ce43f805276a1 [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export __wbg_random_c481bfb857abeff2 [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export __wbindgen_throw [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export get_random [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export get_random_in_range [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export main [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: module.loaded, module.id, module, __webpack_require__.hmd, __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "main": () => /* binding */ main,
-/* harmony export */   "get_random": () => /* binding */ get_random,
-/* harmony export */   "get_random_in_range": () => /* binding */ get_random_in_range,
-/* harmony export */   "Field": () => /* binding */ Field,
-/* harmony export */   "MovingParticle": () => /* binding */ MovingParticle,
-/* harmony export */   "StaticParticle": () => /* binding */ StaticParticle,
-/* harmony export */   "Vector": () => /* binding */ Vector,
-/* harmony export */   "__wbg_random_c481bfb857abeff2": () => /* binding */ __wbg_random_c481bfb857abeff2,
-/* harmony export */   "__wbg_atan2_133ce43f805276a1": () => /* binding */ __wbg_atan2_133ce43f805276a1,
-/* harmony export */   "__wbindgen_throw": () => /* binding */ __wbindgen_throw
+/* harmony export */   "main": () => (/* binding */ main),
+/* harmony export */   "get_random": () => (/* binding */ get_random),
+/* harmony export */   "get_random_in_range": () => (/* binding */ get_random_in_range),
+/* harmony export */   "Field": () => (/* binding */ Field),
+/* harmony export */   "MovingParticle": () => (/* binding */ MovingParticle),
+/* harmony export */   "StaticParticle": () => (/* binding */ StaticParticle),
+/* harmony export */   "Vector": () => (/* binding */ Vector),
+/* harmony export */   "__wbg_random_c481bfb857abeff2": () => (/* binding */ __wbg_random_c481bfb857abeff2),
+/* harmony export */   "__wbg_atan2_133ce43f805276a1": () => (/* binding */ __wbg_atan2_133ce43f805276a1),
+/* harmony export */   "__wbindgen_throw": () => (/* binding */ __wbindgen_throw)
 /* harmony export */ });
 /* harmony import */ var _valo_bg_wasm__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./valo_bg.wasm */ "../pkg/valo_bg.wasm");
 /* module decorator */ module = __webpack_require__.hmd(module);
-;
+
 
 const lTextDecoder = typeof TextDecoder === 'undefined' ? (0, module.require)('util').TextDecoder : TextDecoder;
 
@@ -498,94 +485,16 @@ const __wbindgen_throw = function(arg0, arg1) {
 
 /***/ }),
 
-/***/ "../pkg/valo_bg.wasm":
-/*!***************************!*\
-  !*** ../pkg/valo_bg.wasm ***!
-  \***************************/
-/*! namespace exports */
-/*! export __wbg_field_free [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_movingparticle_flags [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_movingparticle_pos [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_movingparticle_since [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_movingparticle_vel [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_staticparticle_binding_cfg_id [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_staticparticle_pos [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_staticparticle_rot [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_vector_x [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_get_vector_y [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_movingparticle_free [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_movingparticle_flags [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_movingparticle_pos [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_movingparticle_since [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_movingparticle_vel [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_staticparticle_binding_cfg_id [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_staticparticle_pos [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_staticparticle_rot [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_vector_x [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_set_vector_y [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_staticparticle_free [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbg_vector_free [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbindgen_export_0 [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export __wbindgen_start [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_add_boundary_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_add_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_add_static_particle [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_moving_particles_count [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_moving_particles_ptr [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_new [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_static_particles_count [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_static_particles_ptr [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_update_attachments [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_update_positions [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export field_update_velocities [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export get_random [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export get_random_in_range [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export main [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export memory [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export movingparticle_get_f64_size [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export staticparticle_get_f64_size [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export vector_diff [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export vector_distance_squared [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export vector_dot [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export vector_length [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export vector_new [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! export vector_normalize [provided] [no usage info] [provision prevents renaming (no use info)] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, module, module.id, __webpack_require__.w, __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
-/***/ ((module, exports, __webpack_require__) => {
-
-"use strict";
-"use strict";
-// Instantiate WebAssembly module
-var wasmExports = __webpack_require__.w[module.id];
-__webpack_require__.r(exports);
-// export exports from WebAssembly module
-for(var name in wasmExports) if(name) exports[name] = wasmExports[name];
-// exec imports from WebAssembly module (for esm order)
-/* harmony import */ var m0 = __webpack_require__(/*! ./valo_bg.js */ "../pkg/valo_bg.js");
-
-
-// exec wasm module
-wasmExports[""]()
-
-/***/ }),
-
 /***/ "./app.ts":
 /*!****************!*\
   !*** ./app.ts ***!
   \****************/
-/*! namespace exports */
-/*! export app [provided] [no usage info] [missing usage info prevents renaming] */
-/*! export createApp [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "createApp": () => /* binding */ createApp,
-/* harmony export */   "app": () => /* binding */ app
+/* harmony export */   "createApp": () => (/* binding */ createApp),
+/* harmony export */   "app": () => (/* binding */ app)
 /* harmony export */ });
 /* harmony import */ var _pkg_valo__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../pkg/valo */ "../pkg/valo_bg.js");
 /* harmony import */ var pixi_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! pixi.js */ "pixi.js");
@@ -607,24 +516,24 @@ __webpack_require__.r(__webpack_exports__);
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-;
+
 
 
 
 /// app class
 var App = /** @class */ (function () {
     function App() {
-        this.field = new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Field(_config__WEBPACK_IMPORTED_MODULE_1__.default.field.width, _config__WEBPACK_IMPORTED_MODULE_1__.default.field.height);
+        this.field = new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Field(_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.width, _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.height);
         this.pixi = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.Application({
-            backgroundColor: _config__WEBPACK_IMPORTED_MODULE_1__.default.colours.background,
-            width: _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width,
-            height: _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height,
+            backgroundColor: _config__WEBPACK_IMPORTED_MODULE_1__["default"].colours.background,
+            width: _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width,
+            height: _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height,
             antialias: true,
         });
         this.movingParticlesContainer = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.ParticleContainer(1000, { position: true, tint: true });
         this.staticParticlesContainer = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.ParticleContainer(2000, { position: true, tint: true });
         this.fieldBorder = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.Graphics();
-        this.pixi.ticker.maxFPS = _config__WEBPACK_IMPORTED_MODULE_1__.default.display.maxfps;
+        this.pixi.ticker.maxFPS = _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.maxfps;
         this.ready = false;
         this.paused = false;
         this.lastFrameTime = 0;
@@ -644,19 +553,19 @@ var App = /** @class */ (function () {
         this.pixi.stage.addChild(this.movingParticlesContainer);
         this.pixi.stage.addChild(this.staticParticlesContainer);
         // set particle displays to (0,0) in the center
-        this.movingParticlesContainer.setTransform(_config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.width * 2), _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.height * 2));
-        this.staticParticlesContainer.setTransform(_config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.width * 2), _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.height * 2));
+        this.movingParticlesContainer.setTransform(_config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width / (_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.width * 2), _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / (_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.height * 2));
+        this.staticParticlesContainer.setTransform(_config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width / (_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.width * 2), _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / (_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.height * 2));
         // some basic colours
-        this.movingParticlesContainer.tint = _config__WEBPACK_IMPORTED_MODULE_1__.default.colours.tintMoving;
-        this.staticParticlesContainer.tint = _config__WEBPACK_IMPORTED_MODULE_1__.default.colours.tintStatic;
+        this.movingParticlesContainer.tint = _config__WEBPACK_IMPORTED_MODULE_1__["default"].colours.tintMoving;
+        this.staticParticlesContainer.tint = _config__WEBPACK_IMPORTED_MODULE_1__["default"].colours.tintStatic;
         // field ui
-        this.fieldBorder.lineStyle(4, _config__WEBPACK_IMPORTED_MODULE_1__.default.colours.tintMoving, 1.0);
-        this.fieldBorder.drawCircle(_config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2 - 4);
+        this.fieldBorder.lineStyle(4, _config__WEBPACK_IMPORTED_MODULE_1__["default"].colours.tintMoving, 1.0);
+        this.fieldBorder.drawCircle(_config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / 2 - 4);
         this.pixi.stage.addChild(this.fieldBorder);
         var fieldMask = new pixi_js__WEBPACK_IMPORTED_MODULE_0__.Graphics();
         fieldMask.lineStyle(0);
         fieldMask.beginFill(0xffffff);
-        fieldMask.drawCircle(_config__WEBPACK_IMPORTED_MODULE_1__.default.display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height / 2 - 4);
+        fieldMask.drawCircle(_config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / 2, _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height / 2 - 4);
         fieldMask.endFill();
         this.pixi.stage.mask = fieldMask;
         this.pixi.ticker.add(function (delta) { return _this.loop(delta); });
@@ -674,7 +583,7 @@ var App = /** @class */ (function () {
         var velocityFactor = 0.8;
         if (this.ready && !this.paused) {
             this.simulationTime += delta / 60.;
-            for (var tick = 0; tick < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.ticksPerCall; tick++) {
+            for (var tick = 0; tick < _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.ticksPerCall; tick++) {
                 this.field.update_attachments();
                 if (delta < 0.7) {
                     // take smaller steps for high FPS
@@ -692,11 +601,11 @@ var App = /** @class */ (function () {
                         this.field.update_velocities(velocityFactor);
                     }
                 }
-                if (this.field.moving_particles_count() + this.field.static_particles_count() < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles) {
+                if (this.field.moving_particles_count() + this.field.static_particles_count() < _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.maxParticles) {
                     // additional spawn rate from consumed particles
                     var addSpawnRate = (this.field.static_particles_count() - this.initialStaticParticlesCount) / this.simulationTime;
                     // probability of spawn event happening in the last frame
-                    var expInterval = Math.exp(-(addSpawnRate + _config__WEBPACK_IMPORTED_MODULE_1__.default.field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
+                    var expInterval = Math.exp(-(addSpawnRate + _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.spawnRate) * this.pixi.ticker.elapsedMS / 1000);
                     if (Math.random() > expInterval) {
                         this.field.add_boundary_particle(this.simulationTime);
                     }
@@ -709,20 +618,20 @@ var App = /** @class */ (function () {
         }
         // draw ui
         this.fieldBorder.alpha =
-            (_config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles - this.field.static_particles_count() - this.field.moving_particles_count()) /
-                _config__WEBPACK_IMPORTED_MODULE_1__.default.field.maxParticles;
+            (_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.maxParticles - this.field.static_particles_count() - this.field.moving_particles_count()) /
+                _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.maxParticles;
         if (!this.ready)
             this.stopRender();
     };
     /// Reset the simulation
     App.prototype.reset = function () {
-        this.field = new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Field(_config__WEBPACK_IMPORTED_MODULE_1__.default.field.width, _config__WEBPACK_IMPORTED_MODULE_1__.default.field.height);
+        this.field = new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Field(_config__WEBPACK_IMPORTED_MODULE_1__["default"].field.width, _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.height);
         this.ready = false;
     };
     /// Start a new simulation
     App.prototype.start = function () {
         // add a bunch of movers
-        for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__.default.field.startParticles; i++) {
+        for (var i = 0; i < _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.startParticles; i++) {
             this.field.add_particle();
         }
         this.initialStaticParticlesCount = this.field.static_particles_count();
@@ -755,18 +664,18 @@ var App = /** @class */ (function () {
         this.pixi.stop();
     };
     App.prototype.addCustomParticle = function (viewX, viewY) {
-        var px = ((viewX / _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width) - 0.5) * 2;
-        var py = ((viewY / _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height) - 0.5) * 2;
+        var px = ((viewX / _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width) - 0.5) * 2;
+        var py = ((viewY / _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height) - 0.5) * 2;
         // add particles within some safe distance from border
         if (px * px + py * py < 0.85)
-            this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(px * _config__WEBPACK_IMPORTED_MODULE_1__.default.field.width, py * _config__WEBPACK_IMPORTED_MODULE_1__.default.field.height));
+            this.field.add_static_particle(new _pkg_valo__WEBPACK_IMPORTED_MODULE_3__.Vector(px * _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.width, py * _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.height));
     };
     App.prototype.randomField = function () {
         var mirrors = 3 + Math.trunc(Math.random() * 4);
         var pts = 1 + Math.trunc(mirrors / 2) + Math.trunc(Math.random() * (6 - mirrors / 2));
         for (var i = 0; i < pts; i++) {
             var th = Math.random() * Math.PI * 2;
-            var r = (.2 + Math.random()) * ((i + 1) * .5 / pts) * _config__WEBPACK_IMPORTED_MODULE_1__.default.field.width;
+            var r = (.2 + Math.random()) * ((i + 1) * .5 / pts) * _config__WEBPACK_IMPORTED_MODULE_1__["default"].field.width;
             for (var m = 0; m < mirrors; m++) {
                 var x = Math.sin(th + m * 2 * Math.PI / mirrors);
                 var y = Math.cos(th + m * 2 * Math.PI / mirrors);
@@ -790,16 +699,11 @@ function createApp() {
 /*!***************************!*\
   !*** ./config/colours.ts ***!
   \***************************/
-/*! namespace exports */
-/*! export default [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__, __webpack_require__.r, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
     background: 0x2f2f2f,
@@ -815,16 +719,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!***************************!*\
   !*** ./config/display.ts ***!
   \***************************/
-/*! namespace exports */
-/*! export default [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__, __webpack_require__.r, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
     width: 512,
@@ -839,16 +738,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!*************************!*\
   !*** ./config/field.ts ***!
   \*************************/
-/*! namespace exports */
-/*! export default [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_exports__, __webpack_require__.r, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
     width: 256,
@@ -856,7 +750,7 @@ __webpack_require__.r(__webpack_exports__);
     startParticles: 0,
     maxParticles: 2000,
     spawnRate: 25.,
-    ticksPerCall: 2,
+    ticksPerCall: 2, // simulation iterations per draw call
 });
 
 
@@ -866,16 +760,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!*************************!*\
   !*** ./config/index.ts ***!
   \*************************/
-/*! namespace exports */
-/*! export default [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_exports__, __webpack_require__.r, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => __WEBPACK_DEFAULT_EXPORT__
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 /* harmony import */ var _colours__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./colours */ "./config/colours.ts");
 /* harmony import */ var _display__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./display */ "./config/display.ts");
@@ -895,10 +784,10 @@ __webpack_require__.r(__webpack_exports__);
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-;
 
 
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({ colours: _colours__WEBPACK_IMPORTED_MODULE_0__.default, display: _display__WEBPACK_IMPORTED_MODULE_1__.default, field: _field__WEBPACK_IMPORTED_MODULE_2__.default });
+
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({ colours: _colours__WEBPACK_IMPORTED_MODULE_0__["default"], display: _display__WEBPACK_IMPORTED_MODULE_1__["default"], field: _field__WEBPACK_IMPORTED_MODULE_2__["default"] });
 
 
 /***/ }),
@@ -907,16 +796,11 @@ __webpack_require__.r(__webpack_exports__);
 /*!******************!*\
   !*** ./frame.ts ***!
   \******************/
-/*! namespace exports */
-/*! export updateVisibleParticles [provided] [no usage info] [missing usage info prevents renaming] */
-/*! other exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.n, __webpack_require__.r, __webpack_exports__, __webpack_require__.d, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "updateVisibleParticles": () => /* binding */ updateVisibleParticles
+/* harmony export */   "updateVisibleParticles": () => (/* binding */ updateVisibleParticles)
 /* harmony export */ });
 /* harmony import */ var _pkg_valo__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../pkg/valo */ "../pkg/valo_bg.js");
 /* harmony import */ var _pkg_valo_bg_wasm__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../pkg/valo_bg.wasm */ "../pkg/valo_bg.wasm");
@@ -938,7 +822,7 @@ __webpack_require__.r(__webpack_exports__);
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-;
+
 
 
 
@@ -991,12 +875,8 @@ function regrowParticleContainer(spriteContainer, actualCount) {
 /*!******************!*\
   !*** ./index.ts ***!
   \******************/
-/*! namespace exports */
-/*! exports [not provided] [no usage info] */
-/*! runtime requirements: __webpack_require__, __webpack_require__.r, __webpack_exports__, __webpack_require__.* */
 /***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _app__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./app */ "./app.ts");
 /* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./config */ "./config/index.ts");
@@ -1015,16 +895,16 @@ __webpack_require__.r(__webpack_exports__);
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-;
+
 
 // bind app to DOM
 function bindApp() {
     var _a, _b, _c, _d, _e;
-    if (screen.width < _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width || screen.height < _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height) {
+    if (screen.width < _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width || screen.height < _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height) {
         var dim = Math.min(screen.width - 24, screen.height - 60);
         console.log(dim);
-        _config__WEBPACK_IMPORTED_MODULE_1__.default.display.width = dim;
-        _config__WEBPACK_IMPORTED_MODULE_1__.default.display.height = dim;
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.width = dim;
+        _config__WEBPACK_IMPORTED_MODULE_1__["default"].display.height = dim;
     }
     var app = (0,_app__WEBPACK_IMPORTED_MODULE_0__.createApp)();
     app.load();
@@ -1086,6 +966,27 @@ if (document.readyState !== 'loading')
 else
     window.addEventListener('DOMContentLoaded', bindApp);
 
+
+/***/ }),
+
+/***/ "../pkg/valo_bg.wasm":
+/*!***************************!*\
+  !*** ../pkg/valo_bg.wasm ***!
+  \***************************/
+/***/ ((module, exports, __webpack_require__) => {
+
+"use strict";
+// Instantiate WebAssembly module
+var wasmExports = __webpack_require__.w[module.id];
+__webpack_require__.r(exports);
+// export exports from WebAssembly module
+for(var name in wasmExports) if(name) exports[name] = wasmExports[name];
+// exec imports from WebAssembly module (for esm order)
+/* harmony import */ var m0 = __webpack_require__(/*! ./valo_bg.js */ "../pkg/valo_bg.js");
+
+
+// exec wasm module
+wasmExports[""]()
 
 /***/ })
 
